@@ -1,5 +1,1 @@
 ---
-
-firewall:
-  services:
-    - ssh
