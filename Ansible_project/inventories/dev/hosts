@@ -1,16 +1,16 @@
 [database]
-89.208.221.89
-37.139.43.245
-89.208.223.42
+db1 ansible_host=89.208.221.89
+db2 ansible_host=37.139.43.245
+db3 ansible_host=89.208.223.42
 
 [webservers]
-87.239.109.182
-178.154.221.242
-89.208.198.16
+web1 ansible_host=87.239.109.182
+web2 ansible_host=178.154.221.242
+web3 ansible_host=89.208.198.16
 
 
 [appservers]
-85.192.32.65
-37.139.40.21
+app1 ansible_host=85.192.32.65
+app2 ansible_host=37.139.40.21
 
 
