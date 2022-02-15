@@ -1,7 +1,7 @@
 ---
 
 - name: Allow nginx to site files in /srv/www
-  community.general.sefcontext:
+  sefcontext:
     target: '/srv/www(/.*)?'
     setype: httpd_sys_content_t
     state: present
