@@ -2,9 +2,9 @@
   import_role:
     name: os/package
   vars:
-    package_action: "install"
-    package_list:
-      - "firewalld"
+    package_action: "present"
+    package_name:
+      - firewalld
 
 - name: Enable and unmask the firewalld
   systemd:
@@ -16,8 +16,9 @@
 
 - name: Open firewall for service ssh
   firewalld:
-    service: "{{ items }}"
+    service: "{{ item }}"
     permanent: yes
     state: enabled
   loop:
     - ssh
+#   "{{firewall.services}}"
