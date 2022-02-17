@@ -1,5 +1,5 @@
 ---
 
-- hosts: appservers
+- hosts: app1
   roles:
     - apps/nginx
