@@ -1,0 +1,4 @@
+---
+
+- import_tasks: epel-release.yml
+  tags: ['epel-release']

@@ -2,5 +2,6 @@
 
 - hosts: all
   roles:
+    - os/epel-release
     - os/firewalld
     - os/selinux
