@@ -1,13 +1,10 @@
 ---
 
-- hosts: "{{ item }}"
-  loop:
-#    - all
-    - app1
+- hosts: web2
   gather_facts: False
   roles:
   #  - nginx
-    - os/common/logrotate
+    - os/logrotate
 
 
 
