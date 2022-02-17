@@ -4,6 +4,3 @@
   roles:
 
     - os/epel
-
-    - os/epel
-
