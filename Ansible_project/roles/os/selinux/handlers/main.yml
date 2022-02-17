@@ -1,2 +1,0 @@
-- name: Update selinux filesystem
-  ansible.builtin.command: restorecon -irv /srv/www
