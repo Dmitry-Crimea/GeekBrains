@@ -2,4 +2,8 @@
 
 - hosts: all
   roles:
+
     - os/epel
+
+    - os/epel
+
