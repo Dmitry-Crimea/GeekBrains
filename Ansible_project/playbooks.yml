@@ -1,8 +1,13 @@
 ---
 
-- hosts: all
+- hosts: "{{ item }}"
+  loop:
+#    - all
+    - app1
   gather_facts: False
   roles:
   #  - nginx
+    - os/common/logrotate
+
 
 
