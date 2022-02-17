@@ -1,6 +1,6 @@
 ---
 
-- namee: install logrotate
+- name: install logrotate
   import_tasks: install.yml
 
 - name: logrotate configurate

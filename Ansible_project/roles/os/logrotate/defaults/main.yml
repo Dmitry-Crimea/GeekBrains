@@ -8,6 +8,9 @@ logrotate_path_file: /etc/logrotate.conf
 # Package name to install logrotate.
 logrotate_package: logrotate
 
+# Path to crontab
+logrotate_path_cron: /etc/cron.hourly/logrotate
+
 # Logrotate for wtmp
 logrotate_wtmp_enable: true
 logrotate_wtmp:

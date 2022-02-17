@@ -1,0 +1,6 @@
+---
+
+logrotate:
+  owner: root
+  groop: root
+
