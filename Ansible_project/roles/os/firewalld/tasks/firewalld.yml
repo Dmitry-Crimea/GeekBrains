@@ -3,8 +3,7 @@
     name: os/package
   vars:
     package_action: "present"
-    package_name:
-      - firewalld
+    package_name: "firewalld"
 
 - name: Enable and unmask the firewalld
   systemd:
@@ -14,10 +13,8 @@
     masked: no
     enabled: yes
 
-- name: Open firewall for service ssh
+- name: "Open {{ firewall_ports }} for service ssh"
   firewalld:
-    port: "{{ item }}"
+    port: "{{ firewall_ports }}"
     permanent: yes
     state: enabled
-  loop:
-    "{{ firewall.ports }}"

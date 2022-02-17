@@ -1,9 +1,1 @@
 ---
-
-firewall:
-  ports:
-    - 22/tcp
-
-selinux:
-  files:
-    - '/srv/www(/.*)?'
