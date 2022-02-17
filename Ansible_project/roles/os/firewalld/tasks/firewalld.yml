@@ -16,8 +16,8 @@
 
 - name: Open firewall for service ssh
   firewalld:
-    service: "{{ item }}"
+    port: "{{ item }}"
     permanent: yes
     state: enabled
   loop:
-    "{{ firewall.services }}"
+    "{{ firewall.ports }}"

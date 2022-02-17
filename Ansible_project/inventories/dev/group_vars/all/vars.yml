@@ -1,8 +1,8 @@
 ---
 
 firewall:
-  services:
-    - ssh
+  ports:
+    - 22/tcp
 
 selinux:
   files:
