@@ -2,8 +2,10 @@
 
 - name: Allow nginx to site files in /srv/www
   sefcontext:
-    target: '/srv/www(/.*)?'
+    target: "{{ item }}"
     setype: httpd_sys_content_t
     state: present
+  loop:
+    "{{ selinux.files }}"
   notify:
     - Update selinux filesystem

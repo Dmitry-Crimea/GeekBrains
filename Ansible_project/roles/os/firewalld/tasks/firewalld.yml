@@ -20,5 +20,4 @@
     permanent: yes
     state: enabled
   loop:
-    - ssh
-#   "{{firewall.services}}"
+    "{{ firewall.services }}"

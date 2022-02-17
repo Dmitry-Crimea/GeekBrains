@@ -1,1 +1,9 @@
 ---
+
+firewall:
+  services:
+    - ssh
+
+selinux:
+  files:
+    - '/srv/www(/.*)?'
