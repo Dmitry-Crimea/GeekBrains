@@ -1,6 +1,6 @@
 ---
 
-hosts: db3
+- hosts: db3
 
-roles:
-  - os/chrony
+  roles:
+    - os/chrony
