@@ -2,6 +2,7 @@
 # Path to the include files
 logrotate_include_dir: /etc/logrotate.d
 
+#Path to logrotate config file
 logrotate_path_file: /etc/logrotate.conf
 
 # Package name to install logrotate.
