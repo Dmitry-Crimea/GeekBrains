@@ -7,3 +7,11 @@ firewall:
 selinux:
   files:
     - '/srv/www(/.*)?'
+
+timezone: "Europe/Moscow"
+
+ntp:
+  servers:
+    - pool.ntp.org
+    - 1.ru.pool.ntp.org
+    - 2.ru.pool.ntp.org
