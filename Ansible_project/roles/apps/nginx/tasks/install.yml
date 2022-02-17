@@ -1,3 +1,5 @@
+---
+
 - name: install the latest packages for firewalld
   import_role:
     name: os/package
