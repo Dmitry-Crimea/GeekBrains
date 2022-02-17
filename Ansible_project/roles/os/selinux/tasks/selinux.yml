@@ -1,11 +1,9 @@
 ---
 
-- name: Allow files in selinux
+- name: "Allow {{ selinux_files }} files in selinux"
   sefcontext:
-    target: "{{ item }}"
+    target: "{{ selinux_files }}"
     setype: httpd_sys_content_t
     state: present
-  loop:
-    "{{ selinux.files }}"
   notify:
     - Update selinux filesystem
