@@ -5,5 +5,4 @@
     name: os/package
   vars:
     package_action: "present"
-    package_name:
-      - nginx
+    package_name: "nginx"
