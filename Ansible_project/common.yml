@@ -1,6 +1,0 @@
----
-
-- hosts: all
-  roles:
-    - os/firewalld
-    - os/selinux
