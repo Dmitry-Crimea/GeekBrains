@@ -1,0 +1,28 @@
+---
+# Path to the include files
+logrotate_include_dir: /etc/logrotate.d
+
+# Package name to install logrotate.
+logrotate_package: logrotate
+
+# Logrotate for wtmp
+logrotate_wtmp_enable: true
+logrotate_wtmp:
+  logs:
+    - /var/log/wtmp
+  options:
+    - missingok
+    - monthly
+    - create 0664 root utmp
+    - rotate 1
+
+# Logrotate for btmp
+logrotate_btmp_enable: true
+logrotate_btmp:
+  logs:
+    - /var/log/btmp
+  options:
+    - missingok
+    - monthly
+    - create 0660 root utmp
+    - rotate 1
