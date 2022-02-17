@@ -1,35 +1,3 @@
-[database:children]
-db_node01
-db_node02
 
-[webservers:children]
-web_node01
-web_node02
-web_node03
-
-[appservers:children]
-app_node01
-app_node02
-
-[db_node01]
-89.208.221.89
-
-[db_node02]
-37.139.43.245
-
-[web_node01]
-87.239.109.182
-
-[web_node02]
-178.154.221.242
-
-[web_node03]
-89.208.198.16
-
-[app_node01]
-85.192.32.65
-
-[app_node02]
-37.139.40.21
 
 
