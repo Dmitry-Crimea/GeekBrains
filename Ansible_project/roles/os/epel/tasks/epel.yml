@@ -1,4 +1,6 @@
-- name: install the latest packages for epel-release
+---
+
+- name: install the latest packages for epel
   import_role:
     name: os/package
   vars:
