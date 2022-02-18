@@ -1,0 +1,6 @@
+---
+
+logrotate:
+  owner: root
+  group: root
+

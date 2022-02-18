@@ -1,0 +1,20 @@
+- name: install the latest packages for firewalld
+  import_role:
+    name: os/package
+  vars:
+    package_action: "present"
+    package_name: "firewalld"
+
+- name: Enable and unmask the firewalld
+  systemd:
+    name: "firewalld.service"
+    daemon_reload: yes
+    state: started
+    masked: no
+    enabled: yes
+
+- name: "Open {{ firewall_ports }} for service ssh"
+  firewalld:
+    port: "{{ firewall_ports }}"
+    permanent: yes
+    state: enabled
