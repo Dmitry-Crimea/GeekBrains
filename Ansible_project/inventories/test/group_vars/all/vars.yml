@@ -24,3 +24,7 @@ prometheus:
   local_bin: /usr/local/bin/
   storage: /home/prometheus/data
   retention_time: 180d
+  log: /var/log/prometheus/prometheus.log
+  targets_dir: /etc/prometheus/targets
+  alerts_dir: /etc/prometheus/alerts
+  remove_src: true

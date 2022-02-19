@@ -45,9 +45,9 @@
             - "https"
 
     - name: Reload firewalld service
-        command: firewall-cmd --reload
-    when: "'firewalld.service' in ansible_facts.services"
-    ignore_errors: true
+      command: firewall-cmd --reload
+  when: "'firewalld.service' in ansible_facts.services"
+  ignore_errors: true
 
 
 
@@ -60,6 +60,3 @@
 
 
 
-        - 9094/tcp
-        - 9094/udp
-        - 9100/tcp
