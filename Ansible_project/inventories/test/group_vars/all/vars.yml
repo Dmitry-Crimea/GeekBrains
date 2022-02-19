@@ -12,7 +12,7 @@ logrotate:
 
 
 prometheus:
-  download_url: https://github.com/prometheus/prometheus/releases/download/v2.33.3/prometheus-2.33.3.darwin-amd64.tar.gz
+  download_url: https://github.com/prometheus/prometheus/releases/download/v2.33.3/prometheus-2.33.3.linux-amd64.tar.gz
   download_dir: /home/gu_admin/prometheus/unpack
   unpack_dir: /home/gu_admin/prometheus/unpack
   owner: prometheus
@@ -20,7 +20,7 @@ prometheus:
   etc_dir: /etc/prometheus
   var_lib: /var/lib/prometheus
   version: 2.33.3
-  architecture: darwin-amd64
+  architecture: linux-amd64
   local_bin: /usr/local/bin/
   storage: /home/prometheus/data
   retention_time: 180d
