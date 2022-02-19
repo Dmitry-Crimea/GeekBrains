@@ -1,5 +1,0 @@
----
-
-- name: create letsencrypt directory
-  file: name=/srv/www/letsencrypt state=directory
-

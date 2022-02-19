@@ -1,0 +1,16 @@
+events {}
+
+http {
+    server {
+    listen 80;
+    listen 443 ssl;
+
+    server_name crazydev.cf;
+
+    root /srv/www/site/;
+
+    ssl_certificate        /etc/ssl/crt/crazydev.cf.crt;
+    ssl_certificate_key    /etc/ssl/private/crazydev.cf.pem;
+
+    }
+}

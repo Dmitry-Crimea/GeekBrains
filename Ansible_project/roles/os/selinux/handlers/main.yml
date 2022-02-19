@@ -1,2 +1,4 @@
-- name: Update selinux filesystem
-  ansible.builtin.command: restorecon -irv /srv/www
+---
+
+- name: reload selinux
+  ansible.builtin.command: restorecon -irv {{ selinux_files | replace('(/.*)?','') }}

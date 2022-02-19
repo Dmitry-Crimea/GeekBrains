@@ -6,4 +6,4 @@
     setype: httpd_sys_content_t
     state: present
   notify:
-    - Update selinux filesystem
+    - reload selinux
