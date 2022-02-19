@@ -3,7 +3,7 @@
 - name: Common playbook
   import_playbook: common.yml
 
-- name: Apps playbook
-  import_playbook: apps.yml
+#- name: Apps playbook
+#  import_playbook: apps.yml
 
 
