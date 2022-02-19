@@ -2,9 +2,9 @@
 
 - name: dowload prmetheus
   get_url:
-    url: "{ {prometheus.download_url }}"
+    url: "{{ prometheus.download_url }}"
     dest: "{{ prometheus.download_dir }}"
-    remote_src: yes
+
 
 
 - name: unpack prometheus
@@ -15,7 +15,7 @@
 
 - name: copy prometheus files
   copy:
-    src: "{{  prometheus.unpack_dir }}/{{ item }}"
+    src: "{{  prometheus.unpack_dir }}/prometheus-{{ version }}.{{ architecture }}/{{ item }}"
     dest: "{{ prometheus.local_bin }}/{{ item }}"
     remote_src: true
     owner: "{{ prometheus.owner }}"
