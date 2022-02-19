@@ -3,6 +3,11 @@
 domain_name: crazydev.cf
 letencrypt_email: 3453256@gmail.com
 
+logrotate:
+  owner: root
+  group: root
+  dir: /etc/logrotate.d
+
 
 prometheus:
   download_url: https://github.com/prometheus/prometheus/releases/download/v2.33.3/prometheus-2.33.3.darwin-amd64.tar.gz

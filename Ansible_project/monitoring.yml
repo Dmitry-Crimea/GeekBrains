@@ -1,6 +1,8 @@
 ---
 
-- host: appservers
+- hosts: appservers
   gather_facts: False
-  role:
-    - monitoring
+  roles:
+    - os/packages
+    - os/firewalld
+    - os/monitoring/prometheus

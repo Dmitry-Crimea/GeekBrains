@@ -10,33 +10,33 @@
     shell: /bin/false
 
 
-- name: install and start chrony
-  block:
-    - name: install chrony
-      yum:
-        name: chrony
-        state: present
-        update_cache: yes
+#- name: install and start chrony
+#  block:
+#    - name: install chrony
+#      yum:
+#        name: chrony
+#        state: present
+#        update_cache: yes
+#
+#    - name: start chrony service
+#      service:
+#        name: chrony
+#        state: started
+#        enabled: yes
 
-    - name: start chrony service
-      service:
-        name: chrony
-        state: started
-        enables: yes
-
-- name: configure firewalld
-  block:
-    - name: open ports
-      firewalld:
-        port: "{{ item }}"
-        permanent: yes
-        state: enabled
-      loop:
-        - 9090/tcp
-        - 9093/tcp
-        - 9094/tcp
-        - 9094/udp
-        - 9100/tcp
+#- name: configure firewalld
+#  block:
+#    - name: open ports
+#      firewalld:
+#        port: "{{ item }}"
+#        permanent: yes
+#        state: enabled
+#      loop:
+#        - 9090/tcp
+#        - 9093/tcp
+#        - 9094/tcp
+#        - 9094/udp
+#        - 9100/tcp
 
 - name: make directories for prometheus
   block:

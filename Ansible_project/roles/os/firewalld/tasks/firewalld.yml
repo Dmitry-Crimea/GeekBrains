@@ -13,9 +13,37 @@
     masked: no
     enabled: yes
 
-- name: "Open {{ firewall_ports }} for service ssh"
-  firewalld:
-    port: "{{ firewall_ports }}"
-    permanent: yes
-    immediate: yes
-    state: enabled
+#- name: "Open {{ firewall_ports }} for service ssh"
+#  firewalld:
+#    port: "{{ firewall_ports }}"
+#    permanent: yes
+#    immediate: yes
+#    state: enabled
+
+- name: configure firewalld
+  block:
+    - name: open ports
+      firewalld:
+        port: "{{ item }}"
+        permanent: yes
+        state: enabled
+      loop:
+        - 9090/tcp
+        - 9093/tcp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        - 9094/tcp
+        - 9094/udp
+        - 9100/tcp

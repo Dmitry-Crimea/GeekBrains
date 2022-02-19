@@ -29,5 +29,5 @@
   loop:
     - consoles
     - console_libraries
-    - prometheus.yml
+
 
