@@ -2,3 +2,11 @@
 
 domain_name: crazydev.cf
 letsencrypt_email: 3453256@gmail.com
+
+
+prometheus:
+  download_url: https://github.com/prometheus/prometheus/releases/download/v2.33.3/prometheus-2.33.3.darwin-amd64.tar.gz
+  download_dir:
+  unpack_dir:
+  owner: prometheus
+  group: prometheus

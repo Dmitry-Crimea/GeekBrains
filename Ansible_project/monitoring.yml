@@ -1,0 +1,6 @@
+---
+
+- host: appservers
+  gather_facts: False
+  role:
+    - monitoring

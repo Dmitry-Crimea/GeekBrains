@@ -1,0 +1,33 @@
+---
+
+- name: unpack prometheus
+  unarchive:
+    src: "{{ prometheus.download_dir }}/prometheus-{{prometheus.version}}.{{ prometheus.architecture }}.tar.gz"
+    dest: "{{ prometheus.unpack_dir }}"
+    remote_src: yes
+
+- name: copy prometheus files
+  copy:
+    src: "{{  prometheus.unpack_dir }}/{{ item }}"
+    dest: "{{ prometheus.local_bin }}/{{ item }}"
+    remote_src: true
+    owner: "{{ prometheus.owner }}"
+    group: "{{ prometheus.group }}"
+    mode: 0755
+  loop:
+    - prometheus
+    - promtool
+
+- name: Move files to /etc/prometheus
+  copy:
+    src: "{{ prometheus.unpack_dir }}/{{ item }}"
+    dest: "{{ prometheus.etc_dir }}/{{ item }}"
+    remote_src: true
+    owner: "{{ prometheus.user }}"
+    group: "{{ prometheus.group }}"
+    mode: 0755
+  loop:
+    - consoles
+    - console_libraries
+    - prometheus.yml
+
