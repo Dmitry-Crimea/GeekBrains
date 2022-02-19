@@ -15,7 +15,7 @@
 
 - name: copy prometheus files
   copy:
-    src: "{{  prometheus.unpack_dir }}/prometheus-{{ version }}.{{ architecture }}/{{ item }}"
+    src: "{{  prometheus.unpack_dir }}/prometheus-{{ prometheus.version }}.{{ prometheus.architecture }}/{{ item }}"
     dest: "{{ prometheus.local_bin }}/{{ item }}"
     remote_src: true
     owner: "{{ prometheus.owner }}"
@@ -27,10 +27,10 @@
 
 - name: Move files to /etc/prometheus
   copy:
-    src: "{{ prometheus.unpack_dir }}/{{ item }}"
+    src: "{{  prometheus.unpack_dir }}/prometheus-{{ prometheus.version }}.{{ prometheus.architecture }}/{{ item }}"
     dest: "{{ prometheus.etc_dir }}/{{ item }}"
     remote_src: true
-    owner: "{{ prometheus.user }}"
+    owner: "{{ prometheus.owner }}"
     group: "{{ prometheus.group }}"
     mode: 0755
   loop:

@@ -3,6 +3,8 @@
 domain_name: crazydev.cf
 letencrypt_email: 3453256@gmail.com
 
+systemd_unitdir: /usr/lib/systemd/system
+
 logrotate:
   owner: root
   group: root
@@ -20,3 +22,5 @@ prometheus:
   version: 2.33.3
   architecture: darwin-amd64
   local_bin: /usr/local/bin/
+  storage: /home/prometheus/data
+  retention_time: 180d
