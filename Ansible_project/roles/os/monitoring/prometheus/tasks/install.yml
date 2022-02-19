@@ -1,5 +1,12 @@
 ---
 
+- name: dowload prmetheus
+  get_url:
+    url: "{ {prometheus.download_url }}"
+    dest: "{{ prometheus.download_dir }}"
+    remote_src: yes
+
+
 - name: unpack prometheus
   unarchive:
     src: "{{ prometheus.download_dir }}/prometheus-{{prometheus.version}}.{{ prometheus.architecture }}.tar.gz"

@@ -1,1 +1,10 @@
+---
 
+- name: prepare to ibstall
+  import_tasks: prereq.yml
+
+- name: install prometheus
+  import_tasks: install.yml
+
+- name: configure prometheus
+  import_tasks: config.yml
