@@ -30,8 +30,24 @@
       loop:
         - 9090/tcp
         - 9093/tcp
+        - 9094/tcp
+        - 9094/udp
+        - 9100/tcp
 
+    - name: Open http service
+      firewalld:
+        service: "{{ item  }}"
+        permanent: yes
+        immediate: yes
+        state: enabled
+      loop:
+            - "http"
+            - "https"
 
+    - name: Reload firewalld service
+        command: firewall-cmd --reload
+    when: "'firewalld.service' in ansible_facts.services"
+    ignore_errors: true
 
 
 
