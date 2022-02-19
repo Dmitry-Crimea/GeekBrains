@@ -1,5 +1,4 @@
 ---
-- service_facts:
 
 - name: Add /etc/prometheus/prometheus.yml file
   template:
@@ -10,16 +9,16 @@
     mode: 0750
   notify: restart prometheus
 
-#- name: Logrotate configuration
-#  template:
-#    src: "prometheus.logrotate.j2"
-#    dest: "{{ logrotate.dir }}/prometheus"
-#    mode: 0750
+- name: Logrotate configuration
+  template:
+    src: prometheus.logrotate.j2
+    dest: "{{ logrotate.dir }}/prometheus"
+    mode: 0750
 
 - name: Add prometheus systemd service unit file
   template:
     src: prometheus.service.j2
-    dest: "{{ systemd_unitdir }}/prometheus.service.j2"
+    dest: "{{ systemd_unitdir }}/prometheus.service"
     mode: 0755
   notify: restart prometheus
 
