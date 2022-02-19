@@ -22,7 +22,7 @@ prometheus:
   version: 2.33.3
   architecture: linux-amd64
   local_bin: /usr/local/bin/
-  storage: /home/prometheus/data
+  storage: /home/gu_admin/prometheus/data
   retention_time: 180d
   log: /var/log/prometheus/prometheus.log
   targets_dir: /etc/prometheus/targets
