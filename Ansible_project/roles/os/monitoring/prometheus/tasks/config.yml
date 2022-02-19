@@ -1,4 +1,6 @@
 ---
+- service_facts:
+
 - name: Add /etc/prometheus/prometheus.yml file
   template:
     src: prometheus.yml.j2
