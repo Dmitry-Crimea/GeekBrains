@@ -9,6 +9,7 @@ upstream backend {
   {% for host_name in groups['appservers'] %}
   server {{ hostvars[host_name].ansible_host }}:80;
   {% endfor %}
+  }
     server_tokens off;
     include       mime.types;
     charset       utf-8;
