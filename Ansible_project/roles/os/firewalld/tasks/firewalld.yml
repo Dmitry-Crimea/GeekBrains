@@ -17,4 +17,5 @@
   firewalld:
     port: "{{ firewall_ports }}"
     permanent: yes
+    immediate: yes
     state: enabled
