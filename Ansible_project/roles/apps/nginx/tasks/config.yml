@@ -14,11 +14,7 @@
   loop_control:
     loop_var: firewall_ports
 
-- name: Allow selinux
-  include_role:
-    name: os/selinux
-  vars:
-    selinux_files: "/srv/www(/.*)?"
+# There we must check ssl and create or copy
 
 - name: Generate Diffie-Hellman parameters with the default size (4096 bits)
   community.crypto.openssl_dhparam:
@@ -41,6 +37,15 @@
         owner: nginx
       notify:
         - reload nginx
+
+    - name: Allow selinux
+      include_role:
+        name: os/selinux
+      loop:
+        - "/srv/www(/.*)?"
+        - "/etc/ssl(/.*)?"
+      loop_control:
+        loop_var: selinux_files
 
 #    - name: update upstream config
 #      template:

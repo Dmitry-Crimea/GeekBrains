@@ -5,11 +5,11 @@ events {
 }
 
 http {
-upstream backend {
-  {% for host_name in groups['appservers'] %}
-  server {{ hostvars[host_name].ansible_host }}:80;
-  {% endfor %}
-  }
+# upstream backend {
+#  {% for host_name in groups['appservers'] %}
+#  server {{ hostvars[host_name].ansible_host }}:80;
+#  {% endfor %}
+#  }
     server_tokens off;
     include       mime.types;
     charset       utf-8;
@@ -21,10 +21,10 @@ upstream backend {
     resolver 8.8.8.8;
 
     server {
-    location /
-    {
-      proxy_pass http://backend;
-    }
+#    location /
+#    {
+#      proxy_pass http://backend;
+#    }
     listen 80;
     listen 443 ssl;
 
