@@ -1,0 +1,27 @@
+---
+
+- name: Create user account RedHat
+  user:
+    name: "{{ deploy_user.name }}"
+    password: "{{ deploy_user.passwd | password_hash('sha512') }}"
+    state: present
+    group: whell
+    append: yes
+    shell: "/bin/bash"
+    update_password: on_create
+  when: ansible_os_family == "RedHat"
+
+- name: Create user account Debian system
+  user:
+    name: "{{ deploy_user.name }}"
+    password: "{{ deploy_user.passwd | password_hash('sha512') }}"
+    state: present
+    group: sudo
+    append: yes
+    shell: "/bin/bash"
+    update_password: on_create
+  when: ansible_os_family == "Debian"
+
+- name: User created
+  debug:
+    msg: "Password for {{ deploy_user.name }} is {{ deploy_user.passwd }}"
