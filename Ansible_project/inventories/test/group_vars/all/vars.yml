@@ -10,6 +10,14 @@ logrotate:
   group: root
   dir: /etc/logrotate.d
 
+node_exporter:
+  download_url: https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+  download_dir: /home/gu_admin/node_exporter/unpack
+  owner: prometheus
+  group: prometheus
+  local_bin: /usr/local/bin/
+
+
 
 prometheus:
   download_url: https://github.com/prometheus/prometheus/releases/download/v2.33.3/prometheus-2.33.3.linux-amd64.tar.gz
