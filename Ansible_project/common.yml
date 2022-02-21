@@ -3,3 +3,6 @@
 - hosts: all
   roles:
     - os/epel
+    - os/new-user
+      tags: 
+        - newusr
