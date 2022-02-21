@@ -1,8 +1,15 @@
 ---
 
 - hosts: all
-  roles:
-    - os/epel
-    - os/new-user
-      tags: 
+  tasks:
+    - name: Epel
+      import_role:
+        name: os/epel
+      tags:
+        - epel
+
+    - name: Create new user
+      import_role:
+        name: os/new-user
+      tags:
         - newusr
