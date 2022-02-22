@@ -6,4 +6,7 @@
 - name: Apps playbook
   import_playbook: apps.yml
 
+ - name: monitoring
+   import_playbook: monitoring.yml
+
 

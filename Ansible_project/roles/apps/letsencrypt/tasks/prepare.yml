@@ -11,6 +11,12 @@
     - "/srv/www/site/.well-known/acme-challenge"
 
 - name: Allow selinux
+
+  import_role:
+    name: os/selinux
+  vars:
+    selinux_files: "/srv/www/site/.well-known/acme-challenge(/.*)?"
+
   include_role:
     name: os/selinux
   loop:
@@ -40,6 +46,28 @@
     - name: Get information on generated certificate
       openssl_certificate_info:
         path: /etc/ssl/crt/crazydev.cf.crt
+
+      register: result
+  rescue:
+    - name: Let's create new cert
+      set_fact:
+        result:
+          key_usage_critical: "true"
+
+- name: ttt
+  debug:
+    var: result
+
+- name: Generate a Let's Encrypt Certificate
+  openssl_certificate:
+    path: /etc/ssl/crt/crazydev.cf.crt
+    csr_path: /etc/ssl/csr/crazydev.cf.csr
+    provider: acme
+    acme_accountkey_path: /etc/ssl/private/acme.pem
+    acme_challenge_path: /srv/www/site/.well-known/acme-challenge/
+    force: false
+  when: result.key_usage_critical != "false"
+
         valid_at:
           expweek: "+30d"
       register: result
