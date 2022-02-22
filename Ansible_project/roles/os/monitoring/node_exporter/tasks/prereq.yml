@@ -14,8 +14,8 @@
     create_home: false
 
 - name: create node exporter config dir
-  file: "{{ item }}"
-    path: "{{ node_exporter.dir }}"
+  file:
+    path:  "{{ item }}"
     state: directory
     owner: "{{ node_exporter.user }}"
     group: "{{ node_exporter.group }}"
