@@ -13,6 +13,7 @@
     masked: no
     enabled: yes
 
+
 #- name: "Open {{ firewall_ports }} for service ssh"
 #  firewalld:
 #    port: "{{ firewall_ports }}"
@@ -59,4 +60,12 @@
 
 
 
+
+
+- name: "Open {{ firewall_ports }} for service ssh"
+  firewalld:
+    port: "{{ firewall_ports }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
 

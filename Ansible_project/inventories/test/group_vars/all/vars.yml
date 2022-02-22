@@ -36,3 +36,6 @@ prometheus:
   targets_dir: /etc/prometheus/targets
   alerts_dir: /etc/prometheus/alerts
   remove_src: true
+
+letencrypt_email: 3453256@gmail.com
+
