@@ -5,3 +5,6 @@
 
 - name: install node_exporter
   import_tasks: install.yml
+
+- name: configure node
+  import_tasks: config.yml
