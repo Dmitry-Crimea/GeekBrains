@@ -6,6 +6,14 @@ letencrypt_email: 3453256@gmail.com
 systemd_unitdir: /usr/lib/systemd/system
 architecture: linux-amd64
 
+firewall_ports: 22/tcp
+
+grafana:
+  url:
+  version:
+  dir: /etc/grafana/
+
+
 logrotate:
   owner: root
   group: root
