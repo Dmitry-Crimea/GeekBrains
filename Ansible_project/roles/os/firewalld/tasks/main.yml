@@ -1,6 +1,6 @@
 - name: install the latest packages for firewalld
   import_role:
-    name: os/package
+    name: os/packages
   vars:
     package_action: "present"
     package_name: "firewalld"
@@ -27,6 +27,7 @@
       firewalld:
         port: "{{ item }}"
         permanent: yes
+        immediate: yes
         state: enabled
       loop:
         - 9090/tcp
@@ -34,6 +35,7 @@
         - 9094/tcp
         - 9094/udp
         - 9100/tcp
+        - 3000/tcp
 
     - name: Open http service
       firewalld:
@@ -47,7 +49,7 @@
 
     - name: Reload firewalld service
       command: firewall-cmd --reload
-  when: "'firewalld.service' in ansible_facts.services"
+  when: "'firewalld.service' in ansible_facts.service"
   ignore_errors: true
 
 

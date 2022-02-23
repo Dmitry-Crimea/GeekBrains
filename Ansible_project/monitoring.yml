@@ -4,5 +4,5 @@
   gather_facts: False
   roles:
 #    - os/packages
-    - os/firewalld
+#    - os/firewalld
     - os/monitoring/node_exporter
