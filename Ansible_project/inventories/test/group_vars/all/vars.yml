@@ -8,6 +8,12 @@ architecture: linux-amd64
 
 firewall_ports: 22/tcp
 
+grafana:
+  url:
+  version:
+  dir: /etc/grafana/
+
+
 logrotate:
   owner: root
   group: root
