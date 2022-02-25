@@ -1,35 +1,61 @@
 ---
-- name: Packages
-  include_role:
-    name: os/packages
-  loop:
-    - epel-release
-#    - python3-dev
-    - python3-virtualenv
-    - python3-pip
-#    - tcl-dev
-#    - tk-dev
-#    - python3-tk
-    - git
-#    - virtualenv
-  loop_control:
-    loop_var: packages
+
+- service_facts:
+
+- name: install the latest packages for firewalld
+  import_role:
+    name: os/package
+  vars:
+    package_action: "present"
+    package_name: "python3"
+
+
+- name: Install base needed apt-packages
+  package:
+    name:
+      - python3-virtualenv
+      - python3-pip
+      - git
+      - virtualenv
+    state: latest
 
 - name: Install Gunicorn
   pip:
     name: gunicorn
-    virtualenv: "{{project_name_path}}/env"
+    virtualenv: "{{ project.name_path }}/env"
     virtualenv_command: virtualenv
     virtualenv_python: python3
 
-- name: Create Gunicorn Socket file
-  template: src=gunicorn.socket.j2 dest=/etc/systemd/system/gunicorn.socket
-
 - name: Create Gunicorn Service file
-  template: src=gunicorn.service.j2 dest=/etc/systemd/system/gunicorn.service
+  template:
+    src: 'gunicorn.service.j2'
+    dest: '/etc/systemd/system/gunicorn.service'
+  notify:
+    - restart gunicorn
 
-- name: Start Gunicorn.socket
-  shell: "/bin/systemctl start gunicorn.socket"
+- name: Firewall role
+  include_role:
+    name: os/firewalld_2
+  loop:
+    - "{{ gunicorn_default.port }}/tcp"
+  loop_control:
+    loop_var: firewall_ports
 
-- name: Enable Gunicorn.socket
-  shell: "/bin/systemctl enable gunicorn.socket"
+#- name: Firewalld
+#  block:
+#    - name: Open port
+#      firewalld:
+#        port: "{{ gunicorn_default.port }}/tcp"
+#        permanent: yes
+#        state: enabled
+#
+#    - name: configure. open port http for nginx.service
+#      firewalld:
+#        service: http
+#        permanent: yes
+#        immediate: no
+#        state: enabled
+#
+#    - name: Reload firewalld service
+#      command: firewall-cmd --reload
+#  when: "'firewalld.service' in ansible_facts.services"

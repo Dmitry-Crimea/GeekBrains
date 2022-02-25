@@ -1,3 +1,4 @@
 ---
-    project_name_path: /srv/www/site
-    project_name: crazydev
+gunicorn_default:
+  port: 9999
+  workers: 5

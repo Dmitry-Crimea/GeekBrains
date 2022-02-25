@@ -1,36 +1,100 @@
 ---
-   - name: Creates directory
-     file: path={{project_name_path}} state=directory
+- name: Creates directory
+  file: path={{ project.name_path }} state=directory
 
-   - name: Install Django Framework
-     pip:
-        name: django
-        virtualenv: "{{project_name_path}}/env"
-        virtualenv_command: virtualenv
-        virtualenv_python: python3
+- name: Pull app source code from repo
+  git:
+    repo: "https://github.com/devmahmud/Django-Poll-App.git"
+    dest: "{{ project.name_path }}"
+    force: yes
+    version: master
 
-   - name: Instal python library for PSQL
-     pip:
-        name: psycopg2
-        virtualenv: "{{project_name_path}}/env"
-        virtualenv_command: virtualenv
-        virtualenv_python: python3
+- name: Create Settings File for Django
+  template:
+    src: 'settings.py.j2'
+    dest: "{{ project.name_path }}/{{ project.name }}/settings.py"
 
-   - name: Install a django project
-     command: "{{ project_name_path }}/env/bin/django-admin.py startproject {{ project_name }} chdir={{ project_name_path }}/"
+- name: Make executable manage.py
+  file:
+    path: "{{ project.name_path }}/manage.py"
+    mode: 0777
 
-   - name: Create Settings File for Django
-     template: src=settings.py.j2 dest={{ project_name_path }}/{{ project_name }}/{{ project_name }}/settings.py
+- name: install the package, force upgrade
+  pip:
+    name: "{{ item }}"
+    executable: pip3
+    state: latest
+  loop:
+    - django
+    - asgiref
+    - pytz
+    - sqlparse
+    - consul_kv
 
-   - name: Make migrations
-     shell: "{{project_name_path}}/env/bin/python3 {{ project_name_path }}/{{ project_name }}/manage.py makemigrations"
+- name: install the package, force upgrade
+  pip:
+    name: "{{ item }}"
+    virtualenv: "{{ project.name_path }}/env"
+    state: latest
+  with_items:
+    - 'psycopg2'
+    - 'consul_kv'
 
-   - name: Migrate database
-     django_manage: app_path={{ project_name_path }}/{{ project_name }}
-                        command=migrate
-                        virtualenv={{project_name_path}}/env
+- name: Install specified python requirements in indicated (virtualenv)
+  pip:
+    virtualenv: "{{ project.name_path }}/env"
+    requirements: "{{ project.name_path }}/requirements.txt"
 
-   - name: Get all static files
-     django_manage: app_path={{ project_name_path }}/{{ project_name }}
-                        command=collectstatic
-                        virtualenv={{project_name_path}}/env
+- name: apply django migrations
+  django_manage:
+    command: makemigrations
+    app_path: "{{ project.name_path }}"
+    settings: "{{ project.name }}.settings"
+    virtualenv: "{{ project.name_path }}/env"
+
+- name: apply django migrate
+  django_manage:
+    command: migrate
+    app_path: "{{ project.name_path }}"
+    settings: "{{ project.name }}.settings"
+    virtualenv: "{{project.name_path}}/env"
+
+- name: Create default user
+  django_manage:
+    command: shell -c "from django.contrib.auth.hashers import make_password; from django.contrib.auth import get_user_model; MyUser = get_user_model(); MyUser.objects.filter( username__exact = '{{ django_default.user_name }}' ).count() == 0 or exit(); new_super_user = MyUser( username = '{{ django_default.user_name }}', email='{{ django_default.email }}', is_superuser = True, is_staff = True ); new_super_user.password = make_password('{{ django_default.user_password }}'); new_super_user.save();"
+    app_path: "{{ project.name_path }}"
+    virtualenv: "{{ project.name_path }}/env"
+  ignore_errors: true
+
+#   - name: Install Django Framework
+#     pip:
+#        name: django
+#        virtualenv: "{{project_name_path}}/env"
+#        virtualenv_command: virtualenv
+#        virtualenv_python: python3
+#
+#   - name: Instal python library for PSQL
+#     pip:
+#        name: psycopg2
+#        virtualenv: "{{project_name_path}}/env"
+#        virtualenv_command: virtualenv
+#        virtualenv_python: python3
+#
+#   - name: Install a django project
+#     command: "{{ project_name_path }}/env/bin/django-admin.py startproject {{ project_name }} chdir={{ project_name_path }}/"
+#
+#   - name: Create Settings File for Django
+#     template: src=settings.py.j2 dest={{ project_name_path }}/{{ project_name }}/{{ project_name }}/settings.py
+#
+#   - name: Make migrations
+#     shell: "{{project_name_path}}/env/bin/python3 {{ project_name_path }}/{{ project_name }}/manage.py makemigrations"
+#
+#   - name: Migrate database
+#     django_manage: app_path={{ project_name_path }}/{{ project_name }}
+#                        command=migrate
+#                        virtualenv={{project_name_path}}/env
+#
+#   - name: Get all static files
+#     django_manage: app_path={{ project_name_path }}/{{ project_name }}
+#                        command=collectstatic
+#                        virtualenv={{project_name_path}}/env

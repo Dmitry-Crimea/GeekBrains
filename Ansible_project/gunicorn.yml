@@ -2,6 +2,5 @@
 
 - hosts: appservers
   roles:
-    - apps/nginx
-    - apps/django
     - apps/gunicorn
+    - apps/django
