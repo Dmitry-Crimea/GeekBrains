@@ -1,6 +1,6 @@
 ---
 
-- hosts: test1
+- hosts: all
   gather_facts: False
   roles:
 #    - os/packages

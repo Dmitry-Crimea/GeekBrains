@@ -8,8 +8,8 @@
     group: root
     mode: 0755
 
-- name: Install grafana
-  copy:
-    src: "grafana-{{ grafana.version }}.{{ grafana.architecture }}.rpm"
-    dest: "{{ grafana.dir }}"
-    mode: 0755
+#- name: Install grafana
+#  copy:
+#    src: "grafana-{{ grafana.version }}.{{ grafana.architecture }}.rpm"
+#    dest: "{{ grafana.dir }}"
+#    mode: 0755

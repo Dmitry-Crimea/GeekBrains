@@ -1,10 +1,32 @@
 ---
+- name: Remove repository (and clean up left-over metadata)
+  yum_repository:
+    name: Grafana
+    state: absent
 
-- name: install grafana
-  yum:
-    name: "{{ grafana.dir }}/grafana-{{grafana.version}}.{{grafana.architecture}}.rpm"
-    state: present
+- name: Add repository Grafana
+  yum_repository:
+    name: grafana
+    description: Grafana YUM repo
+    baseurl: https://packages.grafana.com/oss/rpm
+    repo_gpgcheck: yes
+    gpgkey: https://packages.grafana.com/gpg.key
+    gpgcheck: yes
+    sslcacert: /etc/pki/tls/certs/ca-bundle.crt
 
+
+- name: install the packages
+  include_role:
+    name: os/package
+  vars:
+    package_action: "present"
+    package_name: "{{ item }}"
+    update_cache: yes
+  loop:
+    - initscripts
+    - urw-fonts
+    - wget
+    - grafana
 
 - name: start grafana
   service:

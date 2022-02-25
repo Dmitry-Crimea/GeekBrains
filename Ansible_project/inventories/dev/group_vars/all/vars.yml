@@ -9,8 +9,8 @@ architecture: linux-amd64
 firewall_ports: 22/tcp
 
 grafana:
-  url:
-  version: 8.2.0-1
+  url: https://dl.grafana.com/oss/release
+  version: 8.4.2-1
   architecture: x86_64
   dir: /etc/grafana/
 
