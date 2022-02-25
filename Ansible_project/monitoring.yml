@@ -1,0 +1,8 @@
+---
+
+- hosts: test1
+  gather_facts: False
+  roles:
+#    - os/packages
+#    - os/firewalld
+    - os/monitoring/node_exporter

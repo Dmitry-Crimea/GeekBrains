@@ -1,0 +1,6 @@
+---
+
+- name: make grafana dir
+  file:
+    path: "{{ grafana.dir }}"
+    state: directory
