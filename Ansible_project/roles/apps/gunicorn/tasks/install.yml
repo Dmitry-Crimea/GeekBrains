@@ -1,0 +1,35 @@
+---
+- name: Packages
+  include_role:
+    name: os/packages
+  loop:
+    - epel-release
+#    - python3-dev
+    - python3-virtualenv
+    - python3-pip
+#    - tcl-dev
+#    - tk-dev
+#    - python3-tk
+    - git
+#    - virtualenv
+  loop_control:
+    loop_var: packages
+
+- name: Install Gunicorn
+  pip:
+    name: gunicorn
+    virtualenv: "{{project_name_path}}/env"
+    virtualenv_command: virtualenv
+    virtualenv_python: python3
+
+- name: Create Gunicorn Socket file
+  template: src=gunicorn.socket.j2 dest=/etc/systemd/system/gunicorn.socket
+
+- name: Create Gunicorn Service file
+  template: src=gunicorn.service.j2 dest=/etc/systemd/system/gunicorn.service
+
+- name: Start Gunicorn.socket
+  shell: "/bin/systemctl start gunicorn.socket"
+
+- name: Enable Gunicorn.socket
+  shell: "/bin/systemctl enable gunicorn.socket"

@@ -7,7 +7,7 @@
 
 - name: Firewall role
   include_role:
-    name: os/firewalld
+    name: os/firewalld_2
   loop:
     - '80/tcp'
     - '443/tcp'
@@ -16,9 +16,9 @@
 
 # There we must check ssl and create or copy
 
-- name: Generate Diffie-Hellman parameters with the default size (4096 bits)
-  community.crypto.openssl_dhparam:
-    path: /etc/ssl/dhparams.pem
+#- name: Generate Diffie-Hellman parameters with the default size (4096 bits)
+#  community.crypto.openssl_dhparam:
+#    path: /etc/ssl/dhparams.pem
 
 - name: Configure nginx
   block:
