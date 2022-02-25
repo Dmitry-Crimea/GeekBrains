@@ -1,17 +1,14 @@
 [Unit]
 Description=gunicorn daemon
-Requires=gunicorn.socket
-After=network.target
+After=network.target consul.service
 
 [Service]
-User=www-data
-Group=www-data
-WorkingDirectory={{ project_name_path }}/{{ project_name }}
-ExecStart={{ project_name_path }}/env/bin/gunicorn \
+Restart=always
+WorkingDirectory={{ project.name_path }}
+ExecStart={{ project.name_path }}/env/bin/gunicorn \
+          --workers {{ gunicorn_default.workers }} \
+          --bind 0.0.0.0:{{ gunicorn_default.port }} \
           --access-logfile - \
-          --workers 3 \
-          --bind unix:/run/gunicorn.sock \
-          {{ project_name }}.wsgi:application
-
+          {{ project.name }}.wsgi:application
 [Install]
 WantedBy=multi-user.target
