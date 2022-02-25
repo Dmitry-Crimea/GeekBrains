@@ -5,4 +5,4 @@
   roles:
 #    - os/packages
 #    - os/firewalld
-    - os/monitoring/node_exporter
+    - os/monitoring/grafana

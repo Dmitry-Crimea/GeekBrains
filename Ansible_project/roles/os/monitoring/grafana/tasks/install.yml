@@ -1,23 +1,25 @@
 ---
 
-- name: Install grafana
+- name: install grafana
   yum:
-    name: https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana-{{ version }}-1.x86_64.rpm
-    state: latest
+    name: "{{ grafana.dir }}/grafana-{{grafana.version}}.{{grafana.architecture}}.rpm"
+    state: present
 
-- name: "Grafana configuration file copy"
-  template:
-    src: "grafana.conf.j2"
-    dest: /etc/grafana/grafana.ini
-  notify: event_restart_grafana
 
-- name: "Grafana server started"
+- name: start grafana
   service:
     name: grafana-server
     enabled: true
     state: started
 
-- name: "Check if Grafana is accessible."
+- name: Grafana configuration file copy
+  template:
+    src: "grafana.ini.j2"
+    dest: "{{ grafana.dir }}/grafana.ini"
+  notify:  Restart the Grafana service
+
+
+- name: Check if Grafana is accessible
   uri:
     url: http://127.0.0.1:3000
     method: GET
