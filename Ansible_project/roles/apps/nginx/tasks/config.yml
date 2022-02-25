@@ -30,6 +30,16 @@
       notify:
         - reload nginx
 
+- name: Configure nginx
+  block:
+    - name: update nginx config
+      template:
+        src: letsencrypt.conf.j2
+        dest: /etc/nginx/letsencrypt.conf
+        owner: root
+      notify:
+        - reload nginx
+
     - name: update nginx statics
       copy:
         src: "files/"

@@ -1,43 +1,55 @@
 worker_processes  2;
 events {
     use           epoll;
-    worker_connections  128;
+    worker_connections  4096;
 }
 
 http {
-# upstream backend {
-#  {% for host_name in groups['appservers'] %}
-#  server {{ hostvars[host_name].ansible_host }}:80;
-#  {% endfor %}
-#  }
-    server_tokens off;
-    include       mime.types;
-    charset       utf-8;
+ upstream backend {
+  {% for host_name in groups['appservers'] %}
+  server {{ hostvars[host_name].ansible_host }}:80;
+  {% endfor %}
+  }
 
-    ssl_session_cache   shared:SSL:10m;
-    ssl_session_timeout 5m;
-    ssl_prefer_server_ciphers on;
-    ssl_stapling on;
-    resolver 8.8.8.8;
-
-    server {
-#    location /
-#    {
-#      proxy_pass http://backend;
-#    }
+server {
     listen 80;
-    listen 443 ssl;
+    server_name crazydev.rf;
 
-    server_name crazydev.cf;
+        location /.well-known/acme-challenge {
+            proxy_pass http://backend;
+            proxy_next_upstream     error timeout invalid_header http_500 http_404;
+            proxy_connect_timeout   100;
+        }
 
-    root /srv/www/site/;
+        location / {
+        return 301 https://$host$request_uri;
+        }
+}
+server {
 
-    keepalive_timeout   60;
-    ssl_certificate        /etc/ssl/crt/crazydev.cf.crt;
-    ssl_certificate_key    /etc/ssl/private/crazydev.cf.pem;
-    ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
-    ssl_ciphers  "RC4:HIGH:!aNULL:!MD5:!kEDH";
-    add_header Strict-Transport-Security 'max-age=604800';
+        listen 443 ssl;
+        server_name crazydev.cf;
+        server_tokens off;
+        include       mime.types;
+        charset       utf-8;
 
-    }
+        ssl_certificate        /etc/ssl/crt/crazydev.cf.crt;
+        ssl_certificate_key    /etc/ssl/private/crazydev.cf.pem;
+        ssl_prefer_server_ciphers on;
+        ssl_stapling on;
+        resolver 8.8.8.8;
+
+        location /.well-known/acme-challenge {
+            proxy_pass http://backend;
+            proxy_next_upstream     error timeout invalid_header http_500;
+            proxy_connect_timeout   2;
+        }
+
+        location / {
+            root /srv/www/site;
+        }
+}
+server {
+    listen 8080;
+    include letsencrypt.conf;
 }
