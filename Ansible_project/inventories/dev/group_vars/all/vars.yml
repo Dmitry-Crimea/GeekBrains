@@ -1,7 +1,7 @@
 ---
 
 domain_name: crazydev.cf
-letencrypt_email: 3453256@gmail.com
+letencrypt_email:
 
 systemd_unitdir: /usr/lib/systemd/system
 
