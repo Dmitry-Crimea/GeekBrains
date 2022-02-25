@@ -10,7 +10,8 @@ firewall_ports: 22/tcp
 
 grafana:
   url:
-  version:
+  version: 8.2.0-1
+  architecture: x86_64
   dir: /etc/grafana/
 
 
