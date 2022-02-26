@@ -1,21 +1,9 @@
 ---
 
-- name: DNF update the system
-  dnf:
-    name:  "*"
-    state: latest
-
-- name: install epel repo
-  dnf:
-    name: epel-release
-    state: present
-    update_cache: yes
-
 - name: install grafana
-  dnf:
+  yum:
     name: "{{ grafana.dir }}/grafana-{{grafana.version}}.{{grafana.architecture}}.rpm"
     state: present
-    update_cache: yes
 
 
 - name: start grafana
