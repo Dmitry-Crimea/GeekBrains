@@ -62,3 +62,7 @@ pg_django:
   port: '6432'
   cluster_name: 'postgres-cluster'
 
+db_user:  django
+db_password: djangotest1234
+db_name: django
+

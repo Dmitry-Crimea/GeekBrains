@@ -1,0 +1,36 @@
+---
+
+- name: install the packages
+  include_role:
+    name: os/package
+  vars:
+    package_action: "present"
+    package_name: "{{ item }}"
+    update_cache: yes
+  loop:
+    - postgresql
+    - postgresql-contrib
+    - postgresql-server-devel
+    - python3-psycopg2
+    - postgresql-server
+
+- name: create data cluster
+  command: service postgresql initdb
+
+- name: Start and enable postgres
+  service: name=postgresql enabled=yes state=started
+
+- name: Create database
+  postgresql_db: name={{ db_name }}
+  become_user: postgres
+  become: yes
+
+- name: Create user
+  postgresql_user: db={{ db_name }}
+                   name={{ db_user }}
+                   password={{ db_password }}
+                   priv=ALL
+                   state=present
+                   role_attr_flags=NOSUPERUSER,NOCREATEDB
+  become: yes
+  become_user: postgres
