@@ -53,17 +53,6 @@
   ignore_errors: true
 
 
-
-
-
-
-
-
-
-
-
-
-
 - name: "Open {{ firewall_ports }} for service ssh"
   firewalld:
     port: "{{ firewall_ports }}"

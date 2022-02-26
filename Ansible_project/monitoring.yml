@@ -1,8 +1,10 @@
 ---
 
-- hosts: test1
+- hosts: all
   gather_facts: False
   roles:
 #    - os/packages
 #    - os/firewalld
     - os/monitoring/grafana
+    - os/monitoring/prometheus
+    - os/monitoring/node_exporter
