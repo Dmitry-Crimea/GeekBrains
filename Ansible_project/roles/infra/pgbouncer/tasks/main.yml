@@ -1,0 +1,19 @@
+- name: install the packages
+  include_role:
+    name: os/package
+  vars:
+    package_action: "present"
+    package_name: "{{ item }}"
+    update_cache: yes
+  loop:
+    - pgbouncer
+
+- name: Configure pgbouncer
+  block:
+    - name: update pgbouncer config
+      template:
+        src: pgbouncer.ini.j2
+        dest: /etc/pgbouncer.ini
+        owner: root
+      notify:
+        - restart pgboncer

@@ -40,5 +40,243 @@
     name: os/firewalld_2
   loop:
     - '5432/tcp'
+    - '6432/tcp'
   loop_control:
     loop_var: firewall_ports
+
+- name: Make sure the PostgreSQL databases are present
+  become_user: postgres
+  postgresql_db:
+    name: "{{ item.db }}"
+    owner: "{{ item.owner }}"
+    encoding: "{{ item.encoding }}"
+    lc_collate: "{{ item.lc_collate }}"
+    lc_ctype: "{{ item.lc_ctype }}"
+    login_unix_socket: "{{ postgresql_unix_socket_dir }}"
+    port: "{{ postgresql_port }}"
+    template: "template0"
+    state: present
+#  ignore_errors: true
+  loop: "{{ postgresql_databases | flatten(1) }}"
+  when: postgresql_databases is defined and postgresql_databases | length > 0
+  tags: postgresql_databases
+
+- name: Add extensions to the databases
+  become_user: postgres
+  postgresql_ext:
+    db: "{{ item.db }}"
+    name: "{{ item.ext }}"
+    login_unix_socket: "{{ postgresql_unix_socket_dir }}"  # added in 2.8
+    port: "{{ postgresql_port }}"
+    state: present
+#  ignore_errors: true
+  loop: "{{ postgresql_extensions | flatten(1) }}"
+  when:
+    - ansible_version.full is version('2.8.0', '>=')
+    - postgresql_extensions is defined
+    - postgresql_extensions | length > 0
+  tags: postgresql_extensions
+
+- name: Make sure the PostgreSQL users are present
+  become_user: postgres
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    encrypted: true
+    role_attr_flags: "{{ item.flags }}"
+    login_unix_socket: "{{ postgresql_unix_socket_dir }}"
+    port: "{{ postgresql_port }}"
+    state: present
+#  ignore_errors: true
+  loop: "{{ postgresql_users | flatten(1) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: postgresql_users is defined and postgresql_users | length > 0
+  tags: postgresql_users
+
+- name: Make sure handlers are flushed immediately
+  meta: flush_handlers
+
+- block:
+    - name: Check postgresql cluster health
+      run_once: true
+      become: true
+      become_user: postgres
+      command: patronictl -c /etc/patroni/patroni.yml list
+      register: patronictl_result
+      environment:
+        PATH: "{{ ansible_env.PATH }}:/usr/bin:/usr/local/bin"
+      changed_when: false
+
+    - name: PostgreSQL Cluster health
+      run_once: true
+      debug:
+        var: patronictl_result.stdout_lines
+  ignore_errors: true
+  tags: patroni_status, cluster_info, cluster_status, point_in_time_recovery
+
+- block:
+    - name: Get postgresql database list
+      run_once: true
+      become: true
+      become_user: postgres
+      command:
+        "{{ postgresql_bin_dir }}/psql -p {{ postgresql_port }} -U postgres -c
+        \"
+          SELECT
+          d.datname as name,
+          pg_get_userbyid(d.datdba) as owner,
+          pg_encoding_to_char(d.encoding) as encoding,
+          d.datcollate as collate,
+          d.datctype as ctype,
+          CASE
+          WHEN has_database_privilege(d.datname, 'CONNECT')
+          THEN pg_size_pretty(pg_database_size(d.datname))
+          ELSE 'No Access'
+          END
+          size,
+          t.spcname as tablespace
+          FROM pg_catalog.pg_database d
+          JOIN pg_catalog.pg_tablespace t
+          ON d.dattablespace = t.oid
+          WHERE NOT datistemplate
+          ORDER BY 1
+        \""
+      register: dbs_result
+      delegate_to: "{{ groups.master[0] }}"
+      changed_when: false
+
+    - name: PostgreSQL list of databases
+      run_once: true
+      debug:
+        var: dbs_result.stdout_lines
+  ignore_errors: true
+  tags: databases, db_list, cluster_info, cluster_status, point_in_time_recovery
+
+- block:
+    - name: PostgreSQL Cluster connection info
+      run_once: true
+      debug:
+        msg:
+          - +------------------------------------------------+
+          - address (VIP) {{ cluster_vip }}
+          - port {{ haproxy_listen_port.master }} (read/write) master
+          - port {{ haproxy_listen_port.replicas }} (read only)  all replicas
+          - port {{ haproxy_listen_port.replicas_sync }} (read only)  synchronous replica only
+          - port {{ haproxy_listen_port.replicas_async }} (read only)  asynchronous replicas only
+          - +------------------------------------------------+
+      when: with_haproxy_load_balancing|bool and
+            synchronous_mode|bool
+
+    - name: PostgreSQL Cluster connection info
+      run_once: true
+      debug:
+        msg:
+          - +------------------------------------------------+
+          - address (VIP) {{ cluster_vip }}
+          - port {{ haproxy_listen_port.master }} (read/write) master
+          - port {{ haproxy_listen_port.replicas }} (read only)  all replicas
+          - +------------------------------------------------+
+      when: with_haproxy_load_balancing|bool and
+            not synchronous_mode|bool
+
+    - name: PostgreSQL Cluster connection info
+      run_once: true
+      debug:
+        msg:
+          - +------------------------------------------------+
+          - address (VIP) {{ cluster_vip }}
+          - port {{ pgbouncer_listen_port }} (pgbouncer)
+          - +------------------------------------------------+
+      when: not with_haproxy_load_balancing|bool and
+            pgbouncer_install|bool
+
+    - name: PostgreSQL Cluster connection info
+      run_once: true
+      debug:
+        msg:
+          - +------------------------------------------------+
+          - address (VIP) {{ cluster_vip }}
+          - port {{ postgresql_port }}
+          - +------------------------------------------------+
+      when: not with_haproxy_load_balancing|bool and
+            not pgbouncer_install|bool
+  when: cluster_vip is defined and cluster_vip | length > 0
+  ignore_errors: true
+  tags: conn_info, cluster_info, cluster_status
+
+- block:
+    - name: Get vip info
+      set_fact:
+        man_ip: "{{ item }}"
+      loop: "{{ ansible_all_ipv4_addresses }}"
+      when: item == cluster_vip
+
+    - name: Virtual IP Address (VIP) info
+      debug:
+        msg:
+          "Cluster ip address (VIP) {{ cluster_vip }}
+           is running on server {{ ansible_hostname }}"
+      when: man_ip is defined and man_ip == cluster_vip
+  when: cluster_vip is defined and cluster_vip | length > 0
+  ignore_errors: true
+  tags: vip_owner, vip_status, cluster_info, cluster_status
+
+
+- block:  # if cluster_vip is not defined
+    - name: Create list of nodes
+      run_once: true
+      set_fact:
+        haproxy_nodes: "{% for host in groups['balancers'] %}{{ hostvars[host]['inventory_hostname'] }}{% if not loop.last %},{% endif %}{% endfor %}"  # noqa 204
+        postgres_cluster_nodes: "{% for host in groups['postgres_cluster'] %}{{ hostvars[host]['inventory_hostname'] }}{% if not loop.last %},{% endif %}{% endfor %}"  # noqa 204
+
+    - name: PostgreSQL Cluster connection info
+      run_once: true
+      debug:
+        msg:
+          - +------------------------------------------------+
+          - address {{ haproxy_nodes }}
+          - port {{ haproxy_listen_port.master }} (read/write) master
+          - port {{ haproxy_listen_port.replicas }} (read only)  all replicas
+          - port {{ haproxy_listen_port.replicas_sync }} (read only)  synchronous replica only
+          - port {{ haproxy_listen_port.replicas_async }} (read only)  asynchronous replicas only
+          - +------------------------------------------------+
+      when: with_haproxy_load_balancing|bool and
+            synchronous_mode|bool
+
+    - name: PostgreSQL Cluster connection info
+      run_once: true
+      debug:
+        msg:
+          - +------------------------------------------------+
+          - address {{ haproxy_nodes }}
+          - port {{ haproxy_listen_port.master }} (read/write) master
+          - port {{ haproxy_listen_port.replicas }} (read only)  all replicas
+          - +------------------------------------------------+
+      when: with_haproxy_load_balancing|bool and
+            not synchronous_mode|bool
+
+    - name: PostgreSQL Cluster connection info
+      run_once: true
+      debug:
+        msg:
+          - +------------------------------------------------+
+          - address {{ postgres_cluster_nodes }}
+          - port {{ pgbouncer_listen_port }} (pgbouncer)
+          - +------------------------------------------------+
+      when: not with_haproxy_load_balancing|bool and
+            pgbouncer_install|bool
+
+    - name: PostgreSQL Cluster connection info
+      run_once: true
+      debug:
+        msg:
+          - +------------------------------------------------+
+          - address {{ postgres_cluster_nodes }}
+          - port {{ postgresql_port }}
+          - +------------------------------------------------+
+      when: not with_haproxy_load_balancing|bool and
+            not pgbouncer_install|bool
+  ignore_errors: true
+  when: cluster_vip is not defined or cluster_vip | length < 1
+  tags: conn_info, cluster_info, cluster_status
