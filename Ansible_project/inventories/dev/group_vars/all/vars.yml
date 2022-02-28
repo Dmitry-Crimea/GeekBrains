@@ -434,3 +434,10 @@ pgbackrest_patroni_cluster_restore_command:
 
 disable_archive_command: true  # or 'false' to not disable archive_command after restore
 keep_patroni_dynamic_json: true  # or 'false' to remove patroni.dynamic.json after restore (if exists)
+
+synchronous_mode: false  # or 'true' for enable synchronous database replication
+synchronous_mode_strict: false  # if 'true' then block all client writes to the master, when a synchronous replica is not available
+synchronous_node_count: 1  # number of synchronous standby databases
+
+patroni_postgresql_use_pg_rewind: true  # or 'false'
+# try to use pg_rewind on the former leader when it joins cluster as a replica.

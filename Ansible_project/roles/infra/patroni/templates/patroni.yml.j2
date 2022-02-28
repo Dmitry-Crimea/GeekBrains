@@ -29,6 +29,12 @@ restapi:
 #    username: username
 #    password: password
 
+consul:
+  host: 127.0.0.1:8500
+  url: http://127.0.0.1:8500
+  scheme: http
+  veryfy: false
+
 bootstrap:
   method: {{ patroni_cluster_bootstrap_method }}
 {% if patroni_cluster_bootstrap_method == 'wal-g' %}
@@ -45,6 +51,36 @@ bootstrap:
     command: {{ pg_probackup_patroni_cluster_bootstrap_command }}
     no_params: true
 {% endif %}
+  dcs:
+    ttl: {{ patroni_ttl |d(30, true) |int }}
+    loop_wait: {{ patroni_loop_wait |d(10, true) |int }}
+    retry_timeout: {{ patroni_retry_timeout |d(10, true) |int }}
+    maximum_lag_on_failover: {{ patroni_maximum_lag_on_failover |d(1048576, true) |int }}
+    master_start_timeout: {{ patroni_master_start_timeout |d(300, true) |int }}
+    synchronous_mode: {{ synchronous_mode |string |d(false, true) |lower }}
+    synchronous_mode_strict: {{ synchronous_mode_strict |string |d(false, true) |lower }}
+    synchronous_node_count: {{ synchronous_node_count |d(1, true) |int }}
+  {% if patroni_standby_cluster.host is defined and patroni_standby_cluster.host | length > 0 %}
+    standby_cluster:
+      host: {{ patroni_standby_cluster.host }}
+      port: {{ patroni_standby_cluster.port }}
+    {% if patroni_standby_cluster.primary_slot_name is defined and patroni_standby_cluster.primary_slot_name | length > 0 %}
+      primary_slot_name: {{ patroni_standby_cluster.primary_slot_name }}
+    {% endif %}
+    {% if patroni_standby_cluster.restore_command is defined and patroni_standby_cluster.restore_command | length > 0 %}
+      restore_command: {{ patroni_standby_cluster.restore_command }}
+    {% endif %}
+    {% if patroni_standby_cluster.recovery_min_apply_delay is defined and patroni_standby_cluster.recovery_min_apply_delay | length > 0 %}
+      recovery_min_apply_delay: {{ patroni_standby_cluster.recovery_min_apply_delay }}
+    {% endif %}
+  {% endif %}
+    postgresql:
+      use_pg_rewind: {{ patroni_postgresql_use_pg_rewind |string |d(false, true) |lower }}
+      use_slots: true
+      parameters:
+      {% for parameter in postgresql_parameters %}
+        {{ parameter.option }}: {{ parameter.value }}
+      {% endfor %}
 
 {% if postgresql_exists == 'true' %}
 #  initdb:  # List options to be passed on to initdb
