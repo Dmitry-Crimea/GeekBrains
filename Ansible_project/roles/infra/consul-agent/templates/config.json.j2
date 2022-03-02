@@ -1,6 +1,6 @@
 {
   "client_addr": "0.0.0.0",
-  "bind_addr": "{{ inventory_hostname }}",
+  "bind_addr": "{{ hostvars[inventory_hostname].ansible_host }}",
   "datacenter": "{{ datacenter }}",
   "data_dir": "{{ consul_data_dir }}",
   "domain": "consul",
@@ -15,10 +15,10 @@
   "log_level": "INFO",
   "rejoin_after_leave": true,
   "start_join": [
-  {% for host in groups['consul-cluster']%}
-  {% if loop.last %}"{{ hostvars[host].inventory_hostname }}"
+  {% for host in groups['database']%}
+  {% if loop.last %}"{{ hostvars[host].ansible_host }}"
   {% else %}
-  "{{ hostvars[host].inventory_hostname }}",
+  "{{ hostvars[host].ansible_host }}",
   {% endif %}
   {% endfor %}
   ],
