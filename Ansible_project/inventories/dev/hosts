@@ -1,6 +1,6 @@
 
 [database]
-db1 ansible_host=89.208.221.89
+db1 ansible_host=146.185.241.37
 db2 ansible_host=37.139.43.245
 db3 ansible_host=89.208.223.42
 
