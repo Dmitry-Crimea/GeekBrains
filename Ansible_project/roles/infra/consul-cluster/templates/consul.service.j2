@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/bin/bash -c '{{ consul.bin_sources }}/consul agent -config-dir {{ consul.config_dir }}/ -bind {{ inventory_hostname }}'
+ExecStart=/bin/bash -c 'consul agent -config-dir {{ consul.config_dir }}/ -bind {{ hostvars[inventory_hostname].ansible_host }}'
 TimeoutStartSec=0
 
 [Install]
