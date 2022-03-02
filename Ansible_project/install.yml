@@ -4,4 +4,4 @@
   roles:
     #- os/rocky
     - os/packages
-    #- os/user
+    - os/user
