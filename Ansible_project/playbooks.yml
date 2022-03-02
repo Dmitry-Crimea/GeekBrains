@@ -9,9 +9,6 @@
 - name: monitoring
   import_playbook: monitoring.yml
 
-- name: gunicorn playbook
-  import_playbook: gunicorn.yml
-
 #- name: letsencrypt playbook
 #  import_playbook: letsencrypt.yml
 
@@ -30,5 +27,7 @@
 - name: consul_agentplaybook
   import_playbook: consul_agent.yml
 
+- name: gunicorn playbook
+  import_playbook: gunicorn.yml
 
 
