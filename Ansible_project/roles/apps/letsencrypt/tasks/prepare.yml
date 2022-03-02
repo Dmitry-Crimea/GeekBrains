@@ -68,9 +68,9 @@
     force: false
   when: result.key_usage_critical != "false"
 
-        valid_at:
-          expweek: "+30d"
-      register: result
+  valid_at:
+    expweek: "+30d"
+    register: result
     - name: Validate that cert is valid more 7 days
       assert:
         that:

@@ -1,10 +1,10 @@
 ---
+#
+- name: logrotate playbook
+  import_playbook: logrotate.yml
 
-- name: Common playbook
-  import_playbook: common.yml
-
-- name: Apps playbook
-  import_playbook: apps.yml
+#- name: Apps playbook
+#  import_playbook: apps.yml
 
 - name: monitoring
   import_playbook: monitoring.yml
@@ -12,8 +12,8 @@
 - name: gunicorn playbook
   import_playbook: gunicorn.yml
 
-- name: letsencrypt playbook
-  import_playbook: letsencrypt.yml
+#- name: letsencrypt playbook
+#  import_playbook: letsencrypt.yml
 
 - name: postgres playbook
   import_playbook: postgre.yml
