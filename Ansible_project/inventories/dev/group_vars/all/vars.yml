@@ -441,3 +441,23 @@ synchronous_node_count: 1  # number of synchronous standby databases
 
 patroni_postgresql_use_pg_rewind: true  # or 'false'
 # try to use pg_rewind on the former leader when it joins cluster as a replica.
+
+consul:
+  user: consul
+  group: consul
+  bin_sources: /usr/bin
+  config_dir: /etc/consul.d
+  data_dir: /home/consul
+  service_dir: /home/consul/services
+  version: 1.11.2
+  key: EYUNgY66n5tdO10+q6wDPwZPYTOJbxRtd4MfYqhVE/Q=
+
+product: "lenovo"
+city: "home"
+provider: "local"
+provider_type: "laptop"
+datacenter: "kdt-{{ provider }}-{{ city }}-{{ provider_type }}"
+architecture: linux-amd64
+logrotate_dir: /etc/logrotate.d
+systemd_unitdir: /usr/lib/systemd/system
+env: "local"

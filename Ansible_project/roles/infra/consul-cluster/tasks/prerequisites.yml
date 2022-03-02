@@ -63,6 +63,7 @@
         - "8502/tcp"
         - "8600/tcp"
         - "8600/udp"
+        - "80/tcp"
 
     - name: Reload firewalld service
       command: firewall-cmd --reload
