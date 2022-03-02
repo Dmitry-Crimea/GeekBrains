@@ -1,7 +1,9 @@
-- hosts: "{{ item }}"
-  gather_facts: no
+---
+
+- hosts: webservers, appservers
+  gather_facts: False
   roles:
     - infra/consul-agent
-  loop:
-    - webservers
-    - appservers
+#  loop:
+#    - webservers
+#    - appservers
