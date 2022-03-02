@@ -457,7 +457,7 @@ city: "home"
 provider: "local"
 provider_type: "laptop"
 datacenter: "kdt-{{ provider }}-{{ city }}-{{ provider_type }}"
-architecture: linux_amd64
+architecture: linux-amd64
 logrotate_dir: /etc/logrotate.d
 systemd_unitdir: /usr/lib/systemd/system
 env: "local"

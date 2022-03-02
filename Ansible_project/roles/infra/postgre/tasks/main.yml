@@ -18,7 +18,12 @@
 #  command: service postgresql initdb
 
 - name: Start and enable postgres
-  service: name=postgresql enabled=yes state=started
+  service:
+    name: postgresql
+    enabled: yes
+    state: started
+    daemon-reload: yes
+
 
 - name: Create database
   postgresql_db: name={{ pg_django.db_name }}
