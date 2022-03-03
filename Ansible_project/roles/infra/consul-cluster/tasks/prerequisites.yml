@@ -37,6 +37,8 @@
         name: "/noneexistent"
         state: absent
 
+
+
 - name: Directory preparation
   block:
     - name: Create consul (data|cfg) directories

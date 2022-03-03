@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/bin/bash -c '{{ consul.bin_sources }}/consul agent -config-dir {{ consul.config_dir }}/ '
+ExecStart={{ consul.bin_sources }}/consul agent -config-dir {{ consul.config_dir }}
 TimeoutStartSec=0
 
 [Install]

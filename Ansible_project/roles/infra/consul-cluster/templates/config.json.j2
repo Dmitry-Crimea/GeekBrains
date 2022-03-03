@@ -1,5 +1,5 @@
 {
-    {% if hostvars[inventory_hostname].role == ['master'] %}
+    {% if hostvars[inventory_hostname].role == 'master' %}
     "bootstrap_expect": {{ groups['database'] | length }},
     {% endif %}
     "client_addr": "0.0.0.0",

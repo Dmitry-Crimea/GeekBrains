@@ -3,7 +3,7 @@
 - hosts: database
   roles:
     - infra/postgre
-    - infra/consul-cluster
+#    - infra/consul-cluster
     - infra/patroni
     - infra/pgbouncer
 
