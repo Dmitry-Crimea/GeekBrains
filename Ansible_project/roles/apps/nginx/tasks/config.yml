@@ -42,9 +42,10 @@
 
     - name: update nginx statics
       copy:
-        src: "files/"
-        dest: "/srv/www/site"
+        src: "files/ssl/"
+        dest: "/etc/ssl/"
         owner: nginx
+        mode: 600
       notify:
         - reload nginx
 

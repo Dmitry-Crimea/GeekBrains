@@ -6,8 +6,14 @@ events {
 
 http {
  upstream backend {
-  {% for host_name in groups['appservers'] %}
+  {% for host_name in groups['webservers'] %}
   server {{ hostvars[host_name].ansible_host }}:80;
+  {% endfor %}
+  }
+  
+ upstream frontend {
+  {% for host_name in groups['appservers'] %}
+  server {{ hostvars[host_name].ansible_host }}:9999;
   {% endfor %}
   }
 
@@ -46,10 +52,11 @@ server {
         }
 
         location / {
-            root /srv/www/site;
+            proxy_pass http://frontend;
         }
 }
 server {
     listen 8080;
     include letsencrypt.conf;
+}
 }
