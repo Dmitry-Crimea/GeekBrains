@@ -6,6 +6,12 @@
 #  debug:
 #    msg: "{{ hostvars[inventory_hostname].role }}"
 
+
+- name: Debug
+  debug:
+    msg: "{{ hostvars[inventory_hostname].role }}"
+
+
 - name: File processing
   block:
     - name: Add config.json file

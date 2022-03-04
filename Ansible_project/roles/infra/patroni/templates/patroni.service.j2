@@ -22,7 +22,7 @@ EnvironmentFile=-/etc/patroni_env.conf
 #ExecStartPre=-/usr/bin/sudo /sbin/modprobe softdog
 #ExecStartPre=-/usr/bin/sudo /bin/chown postgres /dev/watchdog
 
-# Start the patroni process
+# Start the patroni process_
 {% if patroni_installation_method == 'pip' %}
 ExecStart=/usr/local/bin/patroni /etc/patroni/patroni.yml
 {% else %}
@@ -38,7 +38,7 @@ KillMode=process
 # Give a reasonable amount of time for the server to start up/shut down
 TimeoutSec=60
  
-# Do not restart the service if it crashes, we want to manually inspect database on failure
+# Do not restart the service if it crashes, we want to manually inspect database on failure 
 Restart=no
 
 [Install]

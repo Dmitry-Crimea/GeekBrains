@@ -2,6 +2,19 @@
 
 - service_facts:
 
+- name: Gather facts from new server
+  setup:
+    filter: ansible_default_ipv4.address
+
+- name: Set the host name the host
+  hostname:
+    name: "{{ hostvars[inventory_hostname].ansible_host | replace('.','-') }}"
+
+- name: Put SELinux in permissive mode, logging actions that would be blocked.
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
 - name: Users and Groups
   block:
     - name: Add consul group
@@ -52,6 +65,7 @@
       firewalld:
         port: "{{ item  }}"
         permanent: yes
+        immediate: yes
         state: enabled
       loop:
         - "8300/tcp"

@@ -73,6 +73,14 @@
     ansible_python_interpreter: /usr/bin/python3
   tags: patroni, patroni_install
 
+- name: Create data pgsql directory
+  file:
+    path: "/var/lib/pgsql/data"
+    owner: postgres
+    group: postgres
+    state: directory
+    mode: 0700
+
 - block:  # when "patroni_pip_requirements_repo" and "patroni_pip_package_repo" is defined
     - name: Download patroni requirements
       get_url:
@@ -213,37 +221,6 @@
   when: installation_method == "repo" and (patroni_installation_method == "rpm" or patroni_installation_method == "deb")
   tags: patroni, patroni_install
 
-# installation_method: "file" and patroni_installation_method: "rpm/deb"
-- block:
-    # Debian
-    - name: Copy patroni deb package into /tmp
-      copy:
-        src: "{{ patroni_deb_package_file }}"
-        dest: /tmp/
-      when: ansible_os_family == "Debian"
-
-    - name: Install patroni from deb package
-      apt:
-        force_apt_get: true
-        deb: "/tmp/{{ patroni_deb_package_file | basename }}"
-        state: present
-      when: ansible_os_family == "Debian"
-
-    # RedHat
-    - name: Copy patroni rpm package into /tmp
-      copy:
-        src: "{{ patroni_rpm_package_file }}"
-        dest: /tmp/
-      when: ansible_os_family == "RedHat"
-
-    - name: Install patroni from rpm package
-      package:
-        name: "/tmp/{{ patroni_rpm_package_file | basename }}"
-        state: present
-      when: ansible_os_family == "RedHat"
-  when: installation_method == "file" and (patroni_installation_method == "rpm" or patroni_installation_method == "deb")
-  tags: patroni, patroni_install
-
 # Patroni configure
 - name: Create conf directory
   file:
@@ -300,10 +277,10 @@
         backrefs: true
       loop:
         - {regexp: '^name:', line: 'name: {{ ansible_hostname }}'}
-        - {regexp: '^  listen: .*:8008$', line: '  listen: {{ hostvars[inventory_hostname].inventory_hostname }}:8008'}
-        - {regexp: '^  connect_address: .*:8008$', line: '  connect_address: {{ hostvars[inventory_hostname].inventory_hostname }}:8008'}
-        - {regexp: '^  listen: ((?!8008).)*$', line: '  listen: {{ hostvars[inventory_hostname].inventory_hostname }},127.0.0.1:{{ postgresql_port }}'}
-        - {regexp: '^  connect_address: ((?!8008).)*$', line: '  connect_address: {{ hostvars[inventory_hostname].inventory_hostname }}:{{ postgresql_port }}'}
+        - {regexp: '^  listen: .*:8008$', line: '  listen: {{ hostvars[inventory_hostname].ansible_host }}:8008'}
+        - {regexp: '^  connect_address: .*:8008$', line: '  connect_address: {{ hostvars[inventory_hostname].ansible_host }}:8008'}
+        - {regexp: '^  listen: ((?!8008).)*$', line: '  listen: {{ hostvars[inventory_hostname].ansible_host }},127.0.0.1:{{ postgresql_port }}'}
+        - {regexp: '^  connect_address: ((?!8008).)*$', line: '  connect_address: {{ hostvars[inventory_hostname].ansible_host }}:{{ postgresql_port }}'}
       loop_control:
         label: "{{ item.line }}"
       when: with_haproxy_load_balancing|bool or pgbouncer_install|bool or (cluster_vip is not defined or cluster_vip | length < 1)
@@ -316,10 +293,10 @@
         backrefs: true
       loop:
         - {regexp: '^name:', line: 'name: {{ ansible_hostname }}'}
-        - {regexp: '^  listen: .*:8008$', line: '  listen: {{ hostvars[inventory_hostname].inventory_hostname }}:8008'}
-        - {regexp: '^  connect_address: .*:8008$', line: '  connect_address: {{ hostvars[inventory_hostname].inventory_hostname }}:8008'}
-        - {regexp: '^  listen: ((?!8008).)*$', line: '  listen: {{ hostvars[inventory_hostname].inventory_hostname }},{{ cluster_vip }},127.0.0.1:{{ postgresql_port }}'}  # noqa 204
-        - {regexp: '^  connect_address: ((?!8008).)*$', line: '  connect_address: {{ hostvars[inventory_hostname].inventory_hostname }}:{{ postgresql_port }}'}
+        - {regexp: '^  listen: .*:8008$', line: '  listen: {{ hostvars[inventory_hostname].ansible_host }}:8008'}
+        - {regexp: '^  connect_address: .*:8008$', line: '  connect_address: {{ hostvars[inventory_hostname].ansible_host }}:8008'}
+        - {regexp: '^  listen: ((?!8008).)*$', line: '  listen: {{ hostvars[inventory_hostname].ansible_host }},{{ cluster_vip }},127.0.0.1:{{ postgresql_port }}'}  # noqa 204
+        - {regexp: '^  connect_address: ((?!8008).)*$', line: '  connect_address: {{ hostvars[inventory_hostname].ansible_host }}:{{ postgresql_port }}'}
       loop_control:
         label: "{{ item.line }}"
       when: not with_haproxy_load_balancing|bool and not pgbouncer_install|bool and (cluster_vip is defined and cluster_vip | length > 0)
@@ -335,119 +312,13 @@
     mode: 0644
   tags: patroni, patroni_conf, patroni_service
 
-- name: Prepare PostgreSQL | create statistics directory (if not already exists)
-  file:
-    path: "{{ postgresql_stats_temp_directory_path }}"
-    state: directory
-    mode: 01777
-  when:
-    - postgresql_stats_temp_directory_path is defined
-    - postgresql_stats_temp_directory_path != 'none'
-  tags: patroni, pgsql_stats_tmp
-
-- name: Prepare PostgreSQL | mount the statistics directory in memory (tmpfs)
-  mount:
-    path: "{{ postgresql_stats_temp_directory_path }}"
-    src: tmpfs
-    fstype: tmpfs
-    opts: "size={{ postgresql_stats_temp_directory_size }},uid=postgres,gid=postgres"
-    state: mounted
-  when:
-    - postgresql_stats_temp_directory_path is defined
-    - postgresql_stats_temp_directory_path != 'none'
-  tags: patroni, pgsql_stats_tmp
-
-- name: Prepare PostgreSQL | make sure the postgresql log directory "{{ postgresql_log_dir }}" exists
-  file:
-    path: "{{ postgresql_log_dir }}"
-    owner: postgres
-    group: postgres
-    state: directory
-    mode: 0700
-  tags: patroni
-
-- name: Prepare PostgreSQL | make sure the custom WAL directory "{{ postgresql_wal_dir }}" exists
-  file:
-    path: "{{ postgresql_wal_dir }}"
-    owner: postgres
-    group: postgres
-    state: directory
-    mode: 0700
-  when: postgresql_wal_dir is defined and postgresql_wal_dir | length > 0
-  tags: patroni, custom_wal_dir
-
-- block:  # wheh postgresql NOT exists or PITR
-    - name: Prepare PostgreSQL | make sure PostgreSQL data directory "{{ postgresql_data_dir }}" exists
-      file:
-        path: "{{ postgresql_data_dir }}"
-        owner: postgres
-        group: postgres
-        state: directory
-        mode: 0700
-
-    - name: Prepare PostgreSQL | check that data directory "{{ postgresql_data_dir }}" is not initialized
-      stat:
-        path: "{{ postgresql_data_dir }}/PG_VERSION"
-      register: pgdata_initialized
-      when: patroni_cluster_bootstrap_method == "initdb"
-
-    - name: Prepare PostgreSQL | data directory check result
-      fail:
-        msg: "Whoops! data directory {{ postgresql_data_dir }} is already initialized"
-      when: pgdata_initialized.stat.exists is defined and
-            pgdata_initialized.stat.exists
-      tags: patroni, patroni_check_init
-
-      # for Debian based distros only
-      # patroni bootstrap failure is possible if the postgresql config files are missing
-    - name: Prepare PostgreSQL | make sure the postgresql config files exists
-      stat:
-        path: "{{ postgresql_conf_dir }}/postgresql.conf"
-      register: postgresql_conf_file
-      when: ansible_os_family == "Debian" and
-            postgresql_packages|join(" ") is not search("postgrespro")
-
-    - name: Prepare PostgreSQL | generate default postgresql config files
-      become: true
-      become_user: postgres
-      command: >
-        /usr/bin/pg_createcluster {{ postgresql_version }} {{ postgresql_cluster_name }}
-        -d {{ postgresql_data_dir }}
-        -p {{ postgresql_port }}
-        -e {{ postgresql_encoding }}
-        --locale {{ postgresql_locale }}
-      register: pg_createcluster_result
-      failed_when: pg_createcluster_result.rc != 0
-      when: (ansible_os_family == "Debian" and
-            postgresql_packages|join(" ") is not search("postgrespro")) and
-            not postgresql_conf_file.stat.exists
-
-    - name: Prepare PostgreSQL | make sure the data directory "{{ postgresql_data_dir }}" is empty
-      file:
-        path: "{{ postgresql_data_dir }}"
-        state: "{{ item }}"
-        owner: postgres
-        group: postgres
-        mode: 0700
-      loop:
-        - absent
-        - directory
-      when: patroni_cluster_bootstrap_method != "pgbackrest"  # --delta restore
-
-    - name: Prepare PostgreSQL | make sure the custom WAL directory "{{ postgresql_wal_dir }}" is empty
-      file:
-        path: "{{ postgresql_wal_dir }}"
-        state: "{{ item }}"
-        owner: postgres
-        group: postgres
-        mode: 0700
-      loop:
-        - absent
-        - directory
-      when: (postgresql_wal_dir is defined and postgresql_wal_dir | length > 0) and
-            patroni_cluster_bootstrap_method != "pgbackrest"  # --delta restore
-  when: postgresql_exists != "true" or patroni_cluster_bootstrap_method != "initdb"
-  tags: patroni, point_in_time_recovery
+- name: Firewall role
+  include_role:
+    name: os/firewalld_2
+  loop:
+    - '8008/tcp'
+  loop_control:
+    loop_var: firewall_ports
 
 - block:  # when postgresql exists
     - name: Prepare PostgreSQL | check that data directory "{{ postgresql_data_dir }}" is initialized
@@ -472,23 +343,12 @@
             - pg_ctl_status_result.rc != 0
             - pg_ctl_status_result.rc != 3
 
-          # "Debian"
-        - name: Prepare PostgreSQL | start PostgreSQL on Master
-          become: true
-          become_user: postgres
-          command: "/usr/bin/pg_ctlcluster {{ postgresql_version }} {{ postgresql_cluster_name }} start"
-          register: pg_start_on_master
-          when: pg_ctl_status_result.rc == 3 and
-                (ansible_os_family == "Debian" and postgresql_packages|join(" ") is not search("postgrespro"))
-
           # "RedHat" or PostgresPro
         - name: Prepare PostgreSQL | start PostgreSQL on Master
           become: true
           become_user: postgres
           command: "{{ postgresql_bin_dir }}/pg_ctl start -D {{ postgresql_data_dir }}"
           register: pg_start_on_master
-          when: pg_ctl_status_result.rc == 3 and
-                (ansible_os_family == "RedHat" or postgresql_packages|join(" ") is search("postgrespro"))
 
         - name: Prepare PostgreSQL | check PostgreSQL is accepting connections
           become: true
@@ -540,7 +400,7 @@
             state: present
           become: true
           become_user: postgres
-      when: is_master == "true"
+      when: hostvars[inventory_hostname].role == "master"
 
     - name: Prepare PostgreSQL | check PostgreSQL is started
       become: true
@@ -562,21 +422,12 @@
       delay: 10
       when: pg_ctl_status_result.rc == 0
 
-      # "Debian"
-    - name: Prepare PostgreSQL | stop PostgreSQL (will be managed by patroni)
-      become: true
-      become_user: postgres
-      command: "/usr/bin/pg_ctlcluster {{ postgresql_version }} {{ postgresql_cluster_name }} stop -m fast -- -w -t 600"
-      when: (checkpoint_result.rc is defined and checkpoint_result.rc == 0) and
-            (ansible_os_family == "Debian" and postgresql_packages|join(" ") is not search("postgrespro"))
-
       # "RedHat" or PostgresPro
     - name: Prepare PostgreSQL | stop PostgreSQL (will be managed by patroni)
       become: true
       become_user: postgres
       command: "{{ postgresql_bin_dir }}/pg_ctl stop -D {{ postgresql_data_dir }} -m fast -w -t 600"
-      when: (checkpoint_result.rc is defined and checkpoint_result.rc == 0) and
-            (ansible_os_family == "RedHat" or postgresql_packages|join(" ") is search("postgrespro"))
+      when: (checkpoint_result.rc is defined and checkpoint_result.rc == 0)
 
     - name: Prepare PostgreSQL | check PostgreSQL is stopped
       become: true
@@ -609,13 +460,13 @@
       systemd:
         name: patroni
         state: stopped
-      when: is_master != "true"
+      when: hostvars[inventory_hostname].role != "master"
 
     - name: Stop patroni service on the Master server (if running)
       systemd:
         name: patroni
         state: stopped
-      when: is_master == "true"
+      when: hostvars[inventory_hostname].role == "master"
 
     - block:  # for pgbackrest only (for use --delta restore)
         - name: Run "{{ pgbackrest_patroni_cluster_restore_command }}" on Master
@@ -625,7 +476,7 @@
           async: 86400  # timeout 24 hours
           poll: 0
           register: pgbackrest_restore_master
-          when: is_master == "true"
+          when: hostvars[inventory_hostname].role == "master"
 
           # if patroni_create_replica_methods: "pgbackrest"
         - name: Run "{{ pgbackrest_patroni_cluster_restore_command }}" on Replica
@@ -635,7 +486,7 @@
           async: 86400  # timeout 24 hours
           poll: 0
           register: pgbackrest_restore_replica
-          when: is_master != "true" and 'pgbackrest' in patroni_create_replica_methods
+          when: hostvars[inventory_hostname].role != "master" and 'pgbackrest' in patroni_create_replica_methods
 
         - name: Waiting for restore from backup
           async_status:
@@ -651,17 +502,11 @@
           delay: 30
           when: item.ansible_job_id is defined
 
-        - name: Start PostgreSQL for Recovery  # Debian
-          command: "/usr/bin/pg_ctlcluster {{ postgresql_version }} {{ postgresql_cluster_name }} start -o '-c hot_standby=off'"
-          when: ansible_os_family == "Debian" and
-                (is_master == "true" or
-                (is_master != "true" and 'pgbackrest' in patroni_create_replica_methods))
-
         - name: Start PostgreSQL for Recovery  # RedHat or PostgresPro
           command: "{{ postgresql_bin_dir }}/pg_ctl start -D {{ postgresql_data_dir }} -o '-c hot_standby=off'"
           when: (ansible_os_family == "RedHat" or postgresql_packages|join(" ") is search("postgrespro")) and
-                (is_master == "true" or
-                (is_master != "true" and 'pgbackrest' in patroni_create_replica_methods))
+                (hostvars[inventory_hostname].role == "master" or
+                (hostvars[inventory_hostname].role != "master" and 'pgbackrest' in patroni_create_replica_methods))
 
         - name: Waiting for PostgreSQL Recovery to complete (WAL apply)
           command: "{{ postgresql_bin_dir }}/psql -p {{ postgresql_port }} -tAc 'SELECT pg_is_in_recovery()'"
@@ -671,8 +516,8 @@
           delay: 30
           changed_when: false
           failed_when: false
-          when: is_master == "true" or
-                (is_master != "true" and 'pgbackrest' in patroni_create_replica_methods)
+          when: hostvars[inventory_hostname].role == "master" or
+                (hostvars[inventory_hostname].role != "master" and 'pgbackrest' in patroni_create_replica_methods)
 
         - name: Check that PostgreSQL is stopped
           command: "{{ postgresql_bin_dir }}/pg_ctl status -D {{ postgresql_data_dir }}"
@@ -753,7 +598,7 @@
     - name: Wait for port 8008 to become open on the host
       wait_for:
         port: 8008
-        host: "{{ hostvars[inventory_hostname]['inventory_hostname'] }}"
+        host: "{{ hostvars[inventory_hostname].ansible_host }}"
         state: started
         timeout: 120
         delay: 10
@@ -782,17 +627,17 @@
       delay: 30
       changed_when: false
 
-    - name: Wait for the cluster to initialize (master is the leader with the lock)
-      uri:
-        url: "http://{{ hostvars[inventory_hostname]['inventory_hostname'] }}:8008/leader"
-        status_code: 200
-      register: result
-      until: result.status == 200
-      retries: 10
-      delay: 2
-      when: patroni_standby_cluster.host is not defined or patroni_standby_cluster.host | length < 1
-  when: is_master == "true"
-  tags: patroni, patroni_start_master, point_in_time_recovery
+#    - name: Wait for the cluster to initialize (master is the leader with the lock)
+#      uri:
+#        url: "http://{{ hostvars[inventory_hostname].ansible_host }}:8008/leader"
+#        status_code: 200
+#      register: result
+#      until: result.status == 200
+#      retries: 10
+#      delay: 2
+#      when: patroni_standby_cluster.host is not defined or patroni_standby_cluster.host | length < 1
+#  when: hostvars[inventory_hostname].role == "master"
+#  tags: patroni, patroni_start_master, point_in_time_recovery
 
 - block:  # pg_hba (using a templates/pg_hba.conf.j2)
     - name: Prepare PostgreSQL | generate pg_hba.conf
@@ -803,9 +648,6 @@
         group: postgres
         mode: 0640
       register: generate_pg_hba
-      when: is_master == "true" or
-            ((is_master != "true" and postgresql_conf_dir != postgresql_data_dir)
-            or postgresql_exists == "true")
 
     - name: Prepare PostgreSQL | reload for apply the pg_hba.conf
       become: true
@@ -815,7 +657,7 @@
       changed_when: psql_reload_result.rc == 0
       failed_when: false  # exec pg_reload_conf on all running postgres (to re-run with --tag pg_hba).
       when: generate_pg_hba is changed
-  when: existing_pgcluster is not defined or not existing_pgcluster|bool
+  when: hostvars[inventory_hostname].role == "master"
   tags: patroni, pg_hba, pg_hba_generate
 
 - block:  # PITR (custom bootstrap) - superuser and replication
@@ -826,7 +668,7 @@
       retries: 1200  # timeout 10 hours
       delay: 30
       changed_when: false
-      when: is_master == "true"
+      when: hostvars[inventory_hostname].role == "master"
 
     - name: Make sure the postgresql users are present, and password does not differ from the specified
       postgresql_user:
@@ -842,7 +684,7 @@
         - {role: '{{ patroni_replication_username }}', pass: '{{ patroni_replication_password }}', role_attr: 'LOGIN,REPLICATION'}
       loop_control:
         label: "{{ item.role }}"
-      when: is_master == "true"
+      when: hostvars[inventory_hostname].role == "master"
 
     - name: Update postgresql authentication in patroni.yml
       yedit:
@@ -899,7 +741,7 @@
     - name: Wait for port 8008 to become open on the host
       wait_for:
         port: 8008
-        host: "{{ hostvars[inventory_hostname]['inventory_hostname'] }}"
+        host: "{{ hostvars[inventory_hostname].ansible_host }}"
         state: started
         timeout: 120
         delay: 10
@@ -907,13 +749,13 @@
 
     - name: Check that the patroni is healthy on the replica server
       uri:
-        url: "http://{{ hostvars[inventory_hostname]['inventory_hostname'] }}:8008/health"
+        url: "http://{{ hostvars[inventory_hostname].ansible_host }}:8008/health"
         status_code: 200
       register: replica_result
       until: replica_result.status == 200
       retries: 1200  # timeout 10 hours
       delay: 30
-  when: is_master != "true"
+  when: hostvars[inventory_hostname].role != "master"
   tags: patroni, patroni_start_replica, point_in_time_recovery
 
 # create symlink pg_xlog/pg_wal to custom WAL dir
@@ -931,9 +773,9 @@
         group: postgres
         mode: 0644
 
-    - name: Disable "postgresql@{{ postgresql_version }}-{{ postgresql_cluster_name }}" service
+    - name: Disable "postgresql-{{ postgresql_cluster_name }}" service
       systemd:
-        name: "postgresql@{{ postgresql_version }}-{{ postgresql_cluster_name }}"
+        name: "postgresql-{{ postgresql_cluster_name }}"
         enabled: false
         daemon_reload: true
   when: ansible_os_family == "Debian" and
@@ -941,22 +783,13 @@
   tags: patroni, postgresql_disable
 
 # "RedHat"
-- name: Disable "postgresql-{{ postgresql_version }}" service (will be managed by patroni)
+- name: Disable "postgresql" service (will be managed by patroni)
   systemd:
-    name: "postgresql-{{ postgresql_version }}"
+    name: "postgresql"
     enabled: false
     daemon_reload: true
   when: ansible_os_family == "RedHat" and
         postgresql_packages|join(" ") is not search("postgrespro")
-  tags: patroni, postgresql_disable
-
-# PostgresPro
-- name: Disable "postgrespro-std-{{ postgresql_version }}" service (will be managed by patroni)
-  systemd:
-    name: "postgrespro-std-{{ postgresql_version }}"
-    enabled: false
-    daemon_reload: true
-  when: postgresql_packages|join(" ") is search("postgrespro-std")
   tags: patroni, postgresql_disable
 
 # PATRONICTL_CONFIG_FILE (patroni v1.6.1 and higher)
