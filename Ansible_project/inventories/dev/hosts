@@ -9,7 +9,6 @@ web1 ansible_host=87.239.109.182
 web2 ansible_host=62.84.121.143
 web3 ansible_host=89.208.198.16
 
-
 [appservers]
 app1 ansible_host=87.239.110.124
 app2 ansible_host=87.239.105.53
