@@ -17,23 +17,32 @@
     mode: 0750
   tags: pgbouncer_conf, pgbouncer
 
-- name: Stop and disable standard init script
-  service:
-    name: pgbouncer
-    state: stopped
-    enabled: false
-  when: ansible_os_family == "Debian"
-  tags: pgbouncer_service, pgbouncer
 
 - name: Configure pgbouncer
   block:
     - name: update pgbouncer config
       template:
         src: pgbouncer.ini.j2
-        dest: /etc/pgbouncer.ini
+        dest: /etc/pgbouncer/pgbouncer.ini
         owner: root
       notify:
-        - restart pgboncer
+        - restart pgbouncer
+
+- block:  # workaround for pgbouncer from postgrespro repo
+    - name: Check that /usr/bin/pgbouncer is exists
+      stat:
+        path: /usr/bin/pgbouncer
+      register: pgbouncer_bin
+
+- name: Copy systemd service file
+  template:
+    src: templates/pgbouncer.service.j2
+    dest: /etc/systemd/system/pgbouncer.service
+    owner: postgres
+    group: postgres
+    mode: 0644
+  notify: "restart pgbouncer"
+  tags: pgbouncer_service, pgbouncer
 
 - block:  # workaround for pgbouncer from postgrespro repo
     - name: Check that /usr/bin/pgbouncer is exists
@@ -49,8 +58,7 @@
         group: root
         state: link
       when: not pgbouncer_bin.stat.exists
-  when: ansible_os_family == "RedHat" and
-        postgresql_packages|join(" ") is search("postgrespro")
+  when: postgresql_packages|join(" ") is search("postgrespro")
   tags: pgbouncer_service, pgbouncer
 
 - name: Enable log rotation with logrotate
