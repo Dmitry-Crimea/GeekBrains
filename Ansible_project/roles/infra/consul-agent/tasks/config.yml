@@ -33,7 +33,7 @@
     - name: Add consul.service file
       template:
         src: "{{ consul_agent_defaults.service }}.j2"
-        dest: "{{ systemd_unitdir }}/{{ consul_agent_defaults.service }}"
+        dest: "/etc/systemd/system/{{ consul_agent_defaults.service }}"
         owner: root
         group: root
         mode: 0644
