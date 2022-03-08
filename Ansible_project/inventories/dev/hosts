@@ -14,3 +14,6 @@ app1 ansible_host=87.239.110.124
 app2 ansible_host=87.239.105.53
 
 
+[prometheus]
+prom ansible_host=37.139.33.214
+

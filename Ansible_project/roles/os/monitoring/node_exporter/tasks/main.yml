@@ -1,10 +1,14 @@
 ---
 
-- name: prepare to install node_exporter
-  import_tasks: prereq.yml
-
 - name: install node_exporter
-  import_tasks: install.yml
+  block:
+    - name: prepare to install node_exporter
+      import_tasks: prereq.yml
 
-- name: configure node
-  import_tasks: config.yml
+    - name: install node_exporter
+      import_tasks: install.yml
+
+    - name: configure node
+      import_tasks: config.yml
+
+  when: " 'prom' is not in inventory_hostname"
