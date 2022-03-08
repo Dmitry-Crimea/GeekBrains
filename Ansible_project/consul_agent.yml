@@ -1,9 +1,11 @@
 ---
 
-- hosts: webservers, appservers
+- hosts: all
   gather_facts: False
   roles:
-    - infra/consul-agent
+#    - infra/consul-agent
+   - infra/consul_service-register
+
 #  loop:
 #    - webservers
 #    - appservers

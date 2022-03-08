@@ -9,27 +9,32 @@
     - 'consul-agent'
     - 'consul-agent::prerequisites'
     - 'consul-agent::installation'
+  when: " 'prom' in inventory_hostname"
 
 - name: 'INSTALL | Prerequisites Consul-agent'
   import_tasks: "cleanup.yml"
   tags:
     - 'never'
     - 'consul-agent::cleanup'
+  when: " 'prom' in inventory_hostname"
 
 - name: 'INSTALL | Prerequisites Consul-agent'
   import_tasks: "prerequisites.yml"
   tags:
     - 'consul-agent'
     - 'consul-agent::prerequisites'
+  when: " 'prom' in inventory_hostname"
 
 - name: 'INSTALL | Install consul-agent'
   import_tasks: "install.yml"
   tags:
     - 'consul-agent'
     - 'consul-agent::installation'
+  when: " 'prom' in inventory_hostname"
 
 - name: 'INSTALL | Configurations'
   import_tasks: "config.yml"
   tags:
     - 'consul-agent'
     - 'consul-agent::config'
+  when: " 'prom' in inventory_hostname"

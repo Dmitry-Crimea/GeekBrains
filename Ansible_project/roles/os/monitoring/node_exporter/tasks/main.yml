@@ -2,6 +2,9 @@
 
 - name: install node_exporter
   block:
+#    - name: clean up node_exporter
+#      import_tasks: cleanup.yml
+
     - name: prepare to install node_exporter
       import_tasks: prereq.yml
 

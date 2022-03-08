@@ -5,6 +5,8 @@ letencrypt_email:
 
 firewall_ports: 22/tcp
 
+systemd_unitdir: /usr/lib/systemd/system
+
 grafana:
   url: https://dl.grafana.com/oss/release
   version: 8.4.2-1
@@ -18,6 +20,14 @@ logrotate:
   dir: /etc/logrotate.d
 
 node_exporter:
+  logdir: /var/log/node_exporter
+  port: 9100
+  protocol: tcp
+  smartmon_version: "7"
+  service: node_exporter.service
+  smartd_service: smartd.service
+  consul_service: consul.service
+  metrics_dir: /var/lib/node_exporter/metrics
   bin: /usr/local/bin/node_exporter
   dir: /etc/node_exporter
   systemd: /etc/systemd/system
@@ -446,6 +456,9 @@ consul:
   service_dir: /home/consul/services
   version: 1.11.2
   key: EYUNgY66n5tdO10+q6wDPwZPYTOJbxRtd4MfYqhVE/Q=
+
+consul_server_defaults:
+  service: "consul.service"
 
 product: "lenovo"
 city: "home"

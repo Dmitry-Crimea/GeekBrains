@@ -1,8 +1,18 @@
-[test_servers]
-test1 ansible_host=5.188.142.110
-test2 ansible_host=192.168.101.49
+
+[database]
+db1 ansible_host=146.185.241.37 role=master
+db2 ansible_host=37.139.43.245 role=slave
+db3 ansible_host=89.208.223.42 role=slave
+
+[webservers]
+web1 ansible_host=87.239.109.182
+web2 ansible_host=5.188.140.182
+web3 ansible_host=89.208.198.16
+
+[appservers]
+app1 ansible_host=87.239.110.124
+app2 ansible_host=87.239.105.53
 
 
-
-
-  89.208.221.89
+[prometheus]
+prom ansible_host=37.139.33.214
