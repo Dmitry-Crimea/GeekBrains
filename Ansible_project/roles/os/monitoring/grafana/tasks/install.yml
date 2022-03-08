@@ -37,8 +37,8 @@
   notify:  Restart the Grafana service
 
 
-- name: Check if Grafana is accessible
-  uri:
-    url: http://127.0.0.1:3000
-    method: GET
-    status_code: 200
+#- name: Check if Grafana is accessible
+#  uri:
+#    url: http://127.0.0.1:3000
+#    method: GET
+#    status_code: 200
