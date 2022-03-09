@@ -1,10 +1,10 @@
 ---
 
-- hosts: all
+- hosts: !database
   gather_facts: False
   roles:
-#    - infra/consul-agent
-   - infra/consul_service-register
+    - infra/consul-agent
+#   - infra/consul_service-register
 
 #  loop:
 #    - webservers

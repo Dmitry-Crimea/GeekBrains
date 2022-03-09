@@ -1,16 +1,36 @@
 ---
-- name: Populate service facts
-  service_facts:
 
-- name: "register {{ service_name }}"
+- name: Install python-consul module
+  pip:
+    name: python-consul
+    state: present
+
+- name: register nginx service with curl check
+  consul:
+    service_name: nginx
+    service_port: 80
+    script: curl http://localhost
+    interval: 60s
+  when: "'webservers' in {{group_names}}"
+
+- name: Appserver service
   block:
-    - name: Locate config file for consul registration
-      template:
-        src: consul-register.json.j2
-        dest: "/etc/consul.d/{{ id | default(service_name) }}.json"
-        mode: 0755
+    - name: register gunicorn service
+      consul:
+        service_name: gunicorn
+        service_port: 9999
+        script: curl http://localhost:9999
+        interval: 60s
+  when: "'appservers' in {{group_names}}"
 
-    - name: Reload consul
-      shell: "{{ consul.bin_sources }}/consul reload{% if consul.master_token is defined %} --token={{ consul.master_token }}{% endif %}"
-      when: not_reload is not defined
-  when: "'consul.service' in services"
+- name: Database service
+  block:
+    - name: register PGBouncer service
+      consul:
+        service_name: pgbouncer
+        service_port: 6432
+    - name: register PGBouncer service
+      consul:
+        service_name: postgresql
+        service_port: 5432
+  when: "'database' in {{group_names}}"

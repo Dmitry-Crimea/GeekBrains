@@ -8,7 +8,7 @@
 
 - name: Set the host name the host
   hostname:
-    name: "{{ ansible_default_ipv4.address | replace('.','-') }}"
+    name: "{{ hostvars[inventory_hostname].ansible_host | replace('.','-') }}"
 
 - name: Put SELinux in permissive mode, logging actions that would be blocked.
   ansible.posix.selinux:
