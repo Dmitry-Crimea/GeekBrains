@@ -34,3 +34,13 @@
         service_name: postgresql
         service_port: 5432
   when: "'database' in {{group_names}}"
+
+- name: Appserver service
+  block:
+    - name: register node-exporter service
+      consul:
+        service_name: node_exporter
+        service_port: 9100
+        script: curl http://localhost:9100
+        interval: 60s
+  when: "'prometheus' not in {{group_names}}"

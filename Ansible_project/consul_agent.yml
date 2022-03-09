@@ -1,11 +1,6 @@
 ---
 
-- hosts: !database
+- hosts: webservers, appservers, prometheus
   gather_facts: False
   roles:
     - infra/consul-agent
-#   - infra/consul_service-register
-
-#  loop:
-#    - webservers
-#    - appservers

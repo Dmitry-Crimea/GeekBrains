@@ -1,11 +1,11 @@
 ---
 
-- hosts: all
-  gather_facts: False
+- hosts: prometheus
+#  gather_facts: False
   ignore_unreachable: true
   roles:
 #    - os/packages
 #    - os/firewalld
 #    - os/monitoring/prometheus
-    - os/monitoring/node_exporter
-#    - os/monitoring/grafana
+#    - os/monitoring/node_exporter
+    - os/monitoring/grafana
