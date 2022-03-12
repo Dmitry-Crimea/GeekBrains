@@ -11,7 +11,7 @@
     service_port: 80
     script: curl http://localhost
     interval: 60s
-  when: "'webservers' in {{group_names}}"
+  when: "'webservers' in group_names"
 
 - name: Appserver service
   block:
@@ -21,7 +21,7 @@
         service_port: 9999
         script: curl http://localhost:9999
         interval: 60s
-  when: "'appservers' in {{group_names}}"
+  when: "'appservers' in group_names"
 
 - name: Database service
   block:
@@ -33,7 +33,7 @@
       consul:
         service_name: postgresql
         service_port: 5432
-  when: "'database' in {{group_names}}"
+  when: "'database' in group_names"
 
 - name: Appserver service
   block:
@@ -43,4 +43,4 @@
         service_port: 9100
         script: curl http://localhost:9100
         interval: 60s
-  when: "'prometheus' not in {{group_names}}"
+#  when: "'prometheus' not in {{group_names}}"

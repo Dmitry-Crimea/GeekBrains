@@ -5,14 +5,14 @@
     path: '/srv/www'
     state: directory
 
-- name: Firewall role
-  include_role:
-    name: os/firewalld_2
-  loop:
-    - '80/tcp'
-    - '443/tcp'
-  loop_control:
-    loop_var: firewall_ports
+#- name: Firewall role
+#  include_role:
+#    name: os/firewalld
+#  loop:
+#    - '80/tcp'
+#    - '443/tcp'
+#  loop_control:
+#    loop_var: firewall_ports
 
 # There we must check ssl and create or copy
 

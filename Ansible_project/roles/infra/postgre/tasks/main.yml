@@ -2,7 +2,7 @@
 
 #- name: install the packages
 #  include_role:
-#    name: os/package
+#    name: os/packages
 #  vars:
 #    package_action: "present"
 #    package_name: "{{ item }}"

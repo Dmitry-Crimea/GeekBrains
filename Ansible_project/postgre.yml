@@ -2,10 +2,10 @@
 
 - hosts: database
   roles:
+    - infra/postgre
     - infra/pgbouncer
     - infra/patroni
-    - infra/postgre
-    - infra/consul-cluster
+#    - infra/consul-cluster
 
 
 

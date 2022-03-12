@@ -46,7 +46,6 @@
     - name: Get information on generated certificate
       openssl_certificate_info:
         path: /etc/ssl/crt/crazydev.cf.crt
-
       register: result
   rescue:
     - name: Let's create new cert

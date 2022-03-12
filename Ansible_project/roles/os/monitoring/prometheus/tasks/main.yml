@@ -11,4 +11,4 @@
     - name: configure prometheus
       import_tasks: config.yml
 
-  when: " 'prom' in inventory_hostname"
+  when: " 'web2' in inventory_hostname"
