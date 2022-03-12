@@ -545,17 +545,12 @@ packages:
 # firewall variables
 firewall:
   ports:
-    - 2049/tcp
-    - 89/tcp
-    - 111/tcp
-    - 2048/tcp
-    - 8080/tcp
-    - 8443/tcp
-    - 17088/tcp
-    - 17089/tcp
-    - 17090/tcp
-    - 17091/tcp
-    - 17092/tcp
+    - 9090/tcp
+    - 9100/tcp
+    - 3000/tcp
+    - 8500/tcp
+    - 22/tcp
+    - 8300/tcp
 
   services:
     - http

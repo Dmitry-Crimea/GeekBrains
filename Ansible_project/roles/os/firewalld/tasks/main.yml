@@ -13,7 +13,6 @@
     masked: no
     enabled: yes
 
-
 - name: "Open {{ firewall.ports }} h"
   firewalld:
     port: "{{ item }}"
@@ -22,7 +21,6 @@
     state: enabled
     loop:
       - "{{ firewall.ports }}"
-
 
     - name: Open {{ firewall.services }} service
       firewalld:
