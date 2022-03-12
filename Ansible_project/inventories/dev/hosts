@@ -15,5 +15,5 @@ app2 ansible_host=
 
 
 [prometheus]
-prom ansible_host=
+prom ansible_host=89.208.223.139
 
