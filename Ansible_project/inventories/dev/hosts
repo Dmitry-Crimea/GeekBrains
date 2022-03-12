@@ -1,19 +1,19 @@
 
 [database]
-db1 ansible_host=146.185.241.37 role=master
-db2 ansible_host=37.139.43.245 role=slave
-db3 ansible_host=89.208.223.42 role=slave
+db1 ansible_host=      role=master
+db2 ansible_host=      role=slave
+db3 ansible_host=      role=slave
 
 [webservers]
-web1 ansible_host=87.239.109.182
-web2 ansible_host=5.188.140.182
-web3 ansible_host=89.208.198.16
+web1 ansible_host=89.208.222.1
+web2 ansible_host=
+web3 ansible_host=
 
 [appservers]
-app1 ansible_host=87.239.110.124
-app2 ansible_host=87.239.105.53
+app1 ansible_host=
+app2 ansible_host=
 
 
 [prometheus]
-prom ansible_host=37.139.33.214
+prom ansible_host=
 
