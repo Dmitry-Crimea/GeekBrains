@@ -1,8 +1,9 @@
 ---
 
-- hosts: web1, prom
+- hosts: all
+  gather_facts: False
   roles:
 #    - os/rocky
-#    - os/packages
-    - os/user
+    - os/packages
+#    - os/user
 

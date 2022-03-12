@@ -539,6 +539,7 @@ packages:
     - vim
     - wget
     - nginx
+    - postgresql
 
 ####################################################################
 # Firewalld variables
