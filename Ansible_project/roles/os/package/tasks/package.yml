@@ -1,6 +1,0 @@
----
-
-- name: "{{ package_name }} install"
-  dnf:
-    name: "{{ package_name }}"
-    state: "{{ package_action }}"

@@ -504,5 +504,61 @@ architecture: linux-amd64
 logrotate_dir: /etc/logrotate.d
 env: "local"
 
+###################################################################################
+# Packages vars
+
+packages:
+    - epel-release
+    - bash-completion
+    - bind-utils
+    - bzip2
+    - cloud-utils-growpart
+    - curl
+    - fio
+    - firewalld
+    - gdisk
+    - gzip
+    - iotop
+    - iperf3
+#    - jq
+    - lshw
+    - lsof
+    - lz4
+    - nano
+    - nc
+    - net-tools
+    - procps-ng
+    - psmisc
+    - rsync
+    - tar
+    - tcpdump
+    - telnet
+    - traceroute
+    - tree
+    - unzip
+    - vim
+    - wget
+
+####################################################################
+# Firewalld variables
+
+# firewall variables
+firewall:
+  ports:
+    - 2049/tcp
+    - 89/tcp
+    - 111/tcp
+    - 2048/tcp
+    - 8080/tcp
+    - 8443/tcp
+    - 17088/tcp
+    - 17089/tcp
+    - 17090/tcp
+    - 17091/tcp
+    - 17092/tcp
+
+  services:
+    - http
+    - https
 
 
