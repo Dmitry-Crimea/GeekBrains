@@ -10,8 +10,8 @@ web2 ansible_host=89.208.223.139 role=prom
 
 
 [appservers]
-app1 ansible_host=
-app2 ansible_host=
+app1 ansible_host=37.139.41.255
+app2 ansible_host=37.139.42.164
 
 
 
