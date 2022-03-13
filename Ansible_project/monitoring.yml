@@ -7,5 +7,5 @@
 #    - os/packages
 #    - os/firewalld
 #    - os/monitoring/prometheus
-    - os/monitoring/node_exporter
+#    - os/monitoring/node_exporter
     - os/monitoring/grafana

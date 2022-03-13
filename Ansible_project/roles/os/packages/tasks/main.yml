@@ -1,7 +1,6 @@
 ---
 
-- name: Install {{ packages }}
-  dnf:
-    name: "{{ packages }}"
-    state: latest
-  tags: os
+- name: "{{ package_name }} install"
+  package:
+    name: "{{ package_name }}"
+    state: "{{ package_action }}"

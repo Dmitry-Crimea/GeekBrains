@@ -1,11 +1,4 @@
 ---
-- name: Firewall role
-  include_role:
-    name: os/firewalld_2
-  loop:
-    - '3000/tcp'
-  loop_control:
-    loop_var: firewall_ports
 
 - name: make grafana dir
   file:
