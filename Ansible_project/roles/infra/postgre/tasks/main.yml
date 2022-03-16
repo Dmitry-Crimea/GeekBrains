@@ -1,103 +1,14 @@
 ---
 
-#- name: install the packages
-#  include_role:
-#    name: os/packages
-#  vars:
-#    package_action: "present"
-#    package_name: "{{ item }}"
-#    update_cache: yes
-#  loop:
-#    - postgresql
-#    - postgresql-contrib
-#    - postgresql-server-devel
-#    - python3-psycopg2
-#    - postgresql-server
-#
-## PostgreSQL prepare for install (for RHEL 8)
-#- block:
-#    - name: PostgreSQL | check if appstream module is enabled
-#      command: 'dnf -y -C module list postgresql'
-#      register: postgresql_module_result
-#      changed_when: false
-#      args:
-#        warn: false
-#
-#    - name: PostgreSQL | disable appstream module
-#      command: 'dnf -y -C module disable postgresql'
-#      args:
-#        warn: false
-#      when: "'[x] ' not in postgresql_module_result.stdout"
-#  when: installation_method == "repo" and
-#        ansible_distribution_major_version >= '8'
-#  ignore_errors: true
-#  tags: install_postgres
-#
-#
-##- name: create data cluster
-##  command: service postgresql initdb
-#
-#- name: Start and enable postgres
-#  service:
-#    name: postgresql
-#    enabled: yes
-#    state: started
-#    daemon-reload: yes
-- name: debug
-  debug:
-    msg: "{{ item.name }} {{ item.password }}"
-  loop: "{{ postgresql_users | flatten(1) }}"
-  loop_control:
-    label: "{{ item.name }}"
+- name: 'INSTALL_PG | install PostgreSQL'
+  import_tasks: install.yml
+  tags: 'install_postgres'
 
-- name: Make sure the PostgreSQL users are present
-  become: true
-  become_user: postgres
-  postgresql_user:
-    name: "{{ item.name }}"
-    password: "{{ item.password }}"
-    encrypted: true
-    login_unix_socket: "{{ postgresql_unix_socket_dir }}"
-    port: "{{ postgresql_port }}"
-    state: present
-  ignore_errors: true
-  loop: "{{ postgresql_users | flatten(1) }}"
-  loop_control:
-    label: "{{ item.name }}"
-  when: postgresql_users is defined and postgresql_users | length > 0
-  tags: postgresql_users
+- name: 'CREATE_DB | create an db PostgreSQL'
+  import_tasks: database.yml
+  tags: 'postgresql_extensions'
 
-- name: Make sure the PostgreSQL databases are present
-  become: true
-  become_user: postgres
-  postgresql_db:
-    name: "{{ item.db }}"
-    owner: "{{ item.owner }}"
-    encoding: "{{ item.encoding }}"
-    lc_collate: "{{ item.lc_collate }}"
-    lc_ctype: "{{ item.lc_ctype }}"
-    login_unix_socket: "{{ postgresql_unix_socket_dir }}"
-    port: "{{ postgresql_port }}"
-    template: "template0"
-    state: present
-  ignore_errors: true
-  loop: "{{ postgresql_databases | flatten(1) }}"
-  when: postgresql_databases is defined and postgresql_databases | length > 0
-  tags: postgresql_databases
+- name: 'CREATE_USER | create an user PostgreSQL'
+  import_tasks: user.yml
+  tags: 'postgresql_users'
 
-- name: Add extensions to the databases
-  become: true
-  become_user: postgres
-  postgresql_ext:
-    db: "{{ item.db }}"
-    name: "{{ item.ext }}"
-    login_unix_socket: "{{ postgresql_unix_socket_dir }}"  # added in 2.8
-    port: "{{ postgresql_port }}"
-    state: present
-  ignore_errors: true
-  loop: "{{ postgresql_extensions | flatten(1) }}"
-  when:
-    - ansible_version.full is version('2.8.0', '>=')
-    - postgresql_extensions is defined
-    - postgresql_extensions | length > 0
-  tags: postgresql_extensions
