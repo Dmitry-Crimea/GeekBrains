@@ -13,10 +13,11 @@
         template: "template0"
         state: present
       ignore_errors: true
-      loop: "{{ postgresql_databases | flatten(1) }}"
+      loop:
+        - "{{ postgresql_databases | flatten(1) }}"
 
 
--     name: Add extensions to the databases
+    - name: Add extensions to the databases
       postgresql_ext:
         db: "{{ item.db }}"
         name: "{{ item.ext }}"
@@ -24,7 +25,8 @@
         port: "{{ postgresql_port }}"
         state: present
       ignore_errors: true
-      loop: "{{ postgresql_extensions | flatten(1) }}"
+      loop:
+        - "{{ postgresql_extensions | flatten(1) }}"
   when:
         - ansible_version.full is version('2.8.0', '>=')
         - postgresql_extensions is defined
