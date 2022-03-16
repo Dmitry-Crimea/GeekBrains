@@ -34,8 +34,8 @@
   tags: install_postgres
 
 
-- name: create data cluster
-  command: service postgresql initdb
+#- name: create data cluster
+#  command: service postgresql initdb
 
 - name: Start and enable postgres
   service:
